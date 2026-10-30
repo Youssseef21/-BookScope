@@ -10,6 +10,7 @@ from bookscope.db import connect
 from bookscope.f1 import explore
 from bookscope.f2 import compare
 from bookscope.f3 import recommend
+from bookscope.f4 import trace
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -34,6 +35,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = render_compare(params)
             elif parsed.path == "/recommend":
                 body = render_recommend(params)
+            elif parsed.path == "/trace":
+                body = render_trace(params)
             else:
                 self._send(404, page("Introuvable", "<p>Cette page n'existe pas.</p>"))
                 return
@@ -301,6 +304,77 @@ def render_recommend(params: dict[str, list[str]]) -> str:
     return "".join(blocks)
 
 
+def render_trace(params: dict[str, list[str]]) -> str:
+    left = one(params, "x")
+    right = one(params, "y")
+    if not left or not right:
+        return "<p class='warn'>Indiquez deux livres.</p>"
+    result = trace(
+        database(),
+        int(left) if left.isdigit() else left,
+        int(right) if right.isdigit() else right,
+    )
+    status = result["status"]
+    if status == "not_found":
+        return f"<p class='warn'>Aucun livre pour « {esc(result['query'])} ».</p>"
+    if status == "ambiguous":
+        items = "".join(
+            f"<li><a href='/explore?q={book['book_id']}'>{book['book_id']}</a> — {esc(book['title'])} — {esc(book['authors'])}</li>"
+            for book in result["matches"]
+        )
+        return f"<h2>Plusieurs livres correspondent à « {esc(result['query'])} »</h2><ul>{items}</ul>"
+    if status == "same_book":
+        return "<p class='warn'>Il faut deux livres différents.</p>"
+
+    book_a = result["book_a"]
+    book_b = result["book_b"]
+    headline = "Connexion convaincante." if status == "ok" else "Aucune connexion convaincante."
+    blocks = [
+        f"<h2>{headline}</h2>",
+        f"<p>De {book_a['book_id']} — {esc(book_a['title'])}</p>",
+        f"<p>À {book_b['book_id']} — {esc(book_b['title'])}</p>",
+    ]
+    direct = result["direct"]
+    blocks.append("<h3>Lien direct</h3>")
+    blocks.append(
+        "<p>"
+        f"{direct['ordinary_readers']} lecteurs ordinaires ont mis au moins 4/5 aux deux livres. "
+        f"{direct['highly_active_readers']} lecteurs très actifs ont été écartés."
+        "</p>"
+    )
+    if direct["evidence"]:
+        items = []
+        for row in direct["evidence"]:
+            items.append(
+                "<li>"
+                f"lecteur {row['user_id']} : {row['rating_a']}/5 (position {row['source_row_a']}), "
+                f"{row['rating_b']}/5 (position {row['source_row_b']})"
+                "</li>"
+            )
+        blocks.append("<ul>" + "".join(items) + "</ul>")
+    blocks.append("<h3>Chemins indirects</h3>")
+    if not result["indirect"]:
+        blocks.append("<p>Aucun chemin qui évite les livres très notés et les lecteurs très actifs.</p>")
+    for path in result["indirect"]:
+        blocks.append(
+            "<article>"
+            f"<h4>via {path['book_id']} — {esc(path['title'])}</h4>"
+            f"<p>{path['readers_from_a']} lecteurs depuis le premier livre, "
+            f"{path['readers_to_b']} vers le second. "
+            f"{path['ratings_in_selection']} notes dans la sélection.</p>"
+            "</article>"
+        )
+    catalogue = result["catalogue"]
+    blocks.append("<h3>Catalogue</h3>")
+    if catalogue["authors"]:
+        blocks.append("<p>Auteur commun : " + esc(", ".join(catalogue["authors"])) + "</p>")
+    if catalogue["tags"]:
+        blocks.append("<p>Tags précis : " + esc(", ".join(tag["name"] for tag in catalogue["tags"])) + "</p>")
+    if not catalogue["authors"] and not catalogue["tags"]:
+        blocks.append("<p>Pas d'auteur commun, ni de tag de contenu précis.</p>")
+    return "".join(blocks)
+
+
 def esc(value) -> str:
     return html.escape("" if value is None else str(value))
 
@@ -358,6 +432,14 @@ a {{ color: #6e2b23; }}
 <label for="first">Premières notes seulement (facultatif)</label>
 <input id="first" name="first" placeholder="4">
 <button>Proposer</button>
+</form>
+<form action="/trace">
+<h2>Relier deux livres</h2>
+<label for="x">Premier livre</label>
+<input id="x" name="x" placeholder="258">
+<label for="y">Second livre</label>
+<input id="y" name="y" placeholder="1467">
+<button>Relier</button>
 </form>
 </section>
 <section>{result}</section>
