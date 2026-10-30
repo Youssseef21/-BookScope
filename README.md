@@ -78,6 +78,26 @@ Sur cet essai, l'historique du lecteur 1 (112 notes) prend 0,59 ms avec un docum
 
 Les services qui partent d'un livre gardent donc une note par document. L'historique d'un lecteur reste rapide dans les deux rangements.
 
+## Deux instances
+
+Ce n'est pas un cluster de machines. Deux processus MongoDB tournent sur cet ordinateur, avec chacun son port et son disque : `localhost:27018` (A) et `localhost:27019` (B). Les livres et les listes « à lire » sont copiés des deux côtés. Chaque note n'est stockée que d'un côté.
+
+```text
+.venv\Scripts\python.exe scripts\load_distributed.py
+.venv\Scripts\python.exe scripts\compare_distributed.py by_reader
+.venv\Scripts\python.exe scripts\compare_distributed.py by_book
+```
+
+Par lecteur, `user_id` pair va sur A et `user_id` impair sur B. Le lecteur 1 a ses 112 notes sur B et aucune sur A. Le lecteur 2 a ses 60 notes sur A. Le livre 258 est coupé : 648 notes sur A et 668 sur B.
+
+Par livre, `book_id` pair va sur A et `book_id` impair sur B. Le livre 258 a ses 1 316 notes sur A. Le livre 1467 en a 291, toutes sur B. Le lecteur 1 est alors coupé : 58 notes sur A et 54 sur B.
+
+Les mêmes fonctions F1, F2, F3 et F4 donnent le même résultat, dans le même ordre, que sur le serveur unique. Relancer l'import F6 sur la répartition par lecteur ajoute 0 note : les 102 930 notes du lot sont déjà là. Le détail des échanges est dans `data/measurements/distributed.json`.
+
+Pour une question qui part d'un lecteur, la répartition par lecteur lit son historique sur une seule instance. Pour une question qui part d'un livre, la répartition par livre lit ce livre sur une seule instance. Un chemin entre deux livres interroge les deux dans les deux cas, parce qu'il passe par d'autres lecteurs et d'autres livres.
+
+Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne répondent pas. Une partie de ses notes est sur B, et cette partie n'est pas présentée comme un résultat complet.
+
 ## Fichiers
 
 | Chemin | Rôle |
@@ -92,6 +112,8 @@ Les services qui partent d'un livre gardent donc une note par document. L'histor
 | `scripts/link_interests.py` | commande du service F5 |
 | `scripts/import_batch.py` | commande du service F6 |
 | `scripts/measure_model.py` | comparaison des deux rangements de notes |
+| `scripts/load_distributed.py` | copie des livres et répartition des notes |
+| `scripts/compare_distributed.py` | comparaison avec le serveur unique |
 | `scripts/serve.py` | page web locale |
 | `bookscope/f1.py` | calcul des liens d'un livre |
 | `bookscope/f2.py` | comparaison de deux lecteurs |
@@ -99,7 +121,9 @@ Les services qui partent d'un livre gardent donc une note par document. L'histor
 | `bookscope/f4.py` | chemin entre deux livres |
 | `bookscope/f5.py` | lien entre deux thèmes |
 | `bookscope/f6.py` | import d'un lot de notes |
+| `bookscope/cluster.py` | accès aux deux instances |
 | `bookscope/web.py` | interface |
 | `bookscope/tags.py` | tags de statut et tags trop généraux |
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |
 | `data/measurements/model_tradeoff.json` | temps mesurés pour les deux rangements |
+| `data/measurements/distributed.json` | égalité des résultats et échanges entre instances |

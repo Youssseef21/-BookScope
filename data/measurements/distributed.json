@@ -1,0 +1,189 @@
+{
+  "by_reader": {
+    "placement": "by_reader",
+    "note": "Deux processus mongod sur cette machine, pas un cluster de machines.",
+    "local_ratings": {
+      "A": {
+        "endpoint": "localhost:27018",
+        "ratings": 1117112,
+        "user_1": 0,
+        "user_2": 60,
+        "book_258": 648,
+        "book_1467": 139
+      },
+      "B": {
+        "endpoint": "localhost:27019",
+        "ratings": 1115972,
+        "user_1": 112,
+        "user_2": 0,
+        "book_258": 668,
+        "book_1467": 152
+      }
+    },
+    "services": {
+      "f2": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 2,
+            "documents": 118
+          },
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 2,
+            "documents": 66
+          }
+        }
+      },
+      "f1": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 5,
+            "documents": 10205
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 5,
+            "documents": 10333
+          }
+        }
+      },
+      "f4": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 6,
+            "documents": 17018
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 6,
+            "documents": 17084
+          }
+        }
+      },
+      "f3": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 5,
+            "documents": 11162
+          },
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 4,
+            "documents": 10802
+          }
+        }
+      }
+    },
+    "f6": {
+      "inserted": 0,
+      "already_present": 102930,
+      "rejected": 0
+    }
+  },
+  "by_book": {
+    "placement": "by_book",
+    "note": "Deux processus mongod sur cette machine, pas un cluster de machines.",
+    "local_ratings": {
+      "A": {
+        "endpoint": "localhost:27018",
+        "ratings": 1103379,
+        "user_1": 58,
+        "user_2": 34,
+        "book_258": 1316,
+        "book_1467": 0
+      },
+      "B": {
+        "endpoint": "localhost:27019",
+        "ratings": 1129705,
+        "user_1": 54,
+        "user_2": 26,
+        "book_258": 0,
+        "book_1467": 291
+      }
+    },
+    "services": {
+      "f2": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 3,
+            "documents": 96
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 3,
+            "documents": 82
+          }
+        }
+      },
+      "f1": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 5,
+            "documents": 7622
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 2,
+            "documents": 5203
+          }
+        }
+      },
+      "f4": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 5,
+            "documents": 10743
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 5,
+            "documents": 9905
+          }
+        }
+      },
+      "f3": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 5,
+            "documents": 5796
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 5,
+            "documents": 6225
+          }
+        }
+      }
+    }
+  },
+  "by_book_instance_b_stopped": {
+    "F2": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    },
+    "F3": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    }
+  }
+}
