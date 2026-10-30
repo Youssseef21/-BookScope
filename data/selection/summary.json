@@ -1,0 +1,61 @@
+{
+  "rule": {
+    "mystery_tags": [
+      "cozy-mystery",
+      "crime",
+      "crime-fiction",
+      "crime-thriller",
+      "detective",
+      "detectives",
+      "murder",
+      "murder-mystery",
+      "mysteries",
+      "mystery",
+      "mystery-suspense",
+      "mystery-thriller",
+      "suspense",
+      "thriller",
+      "thrillers"
+    ],
+    "min_tag_count": 50,
+    "user_id_mod": 5,
+    "user_id_remainders": [
+      1,
+      2
+    ],
+    "min_mystery_ratings": 8,
+    "keeps": "all ratings of each selected reader"
+  },
+  "time_order": "source_row is the position in ratings.csv. The file has no dates; this order is the relative time order.",
+  "e3_policy": "last 5 ratings of each selected reader",
+  "f6_policy": "5 ratings immediately before the E3 tail of each selected reader",
+  "to_read_policy": "to-read rows of selected readers, except a pair withheld in E3 or F6",
+  "mystery_books": 2393,
+  "readers": 20586,
+  "selection_ratings": 2336014,
+  "mystery_ratings_of_selected_readers": 741899,
+  "e3_ratings": 102930,
+  "f6_ratings": 102930,
+  "working_ratings": 2130154,
+  "books_referenced": 10000,
+  "to_read_kept": 357387,
+  "to_read_dropped_as_holdout_pairs": 279,
+  "ratings_per_reader_in_selection": {
+    "min": 27,
+    "p50": 112,
+    "p90": 146,
+    "max": 199
+  },
+  "ratings_per_reader_loaded": {
+    "min": 17,
+    "p50": 102,
+    "p90": 136,
+    "max": 189
+  },
+  "ratings_per_book_in_selection": {
+    "min": 2,
+    "p50": 96,
+    "p90": 464,
+    "max": 9144
+  }
+}

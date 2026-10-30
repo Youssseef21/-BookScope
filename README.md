@@ -1,0 +1,64 @@
+# BookScope
+
+Plateforme de découverte de livres pour le projet Big Data and NoSQL (M2 SLCD, Université Côte d'Azur). Elle s'appuie sur le jeu [Goodbooks-10k](https://github.com/zygmuntz/goodbooks-10k) et sur MongoDB.
+
+Les notes du fichier `ratings.csv` se relient aux livres par `book_id` (de 1 à 10 000). Les tags se relient par `goodreads_book_id`. L'ordre des lignes de `ratings.csv` est l'ordre relatif dans le temps : le fichier ne contient pas de dates.
+
+## Règle de sélection
+
+Un livre est un polar si au moins un de ces tags a un `count` d'au moins 50 : `mystery`, `mysteries`, `thriller`, `thrillers`, `crime`, `crime-fiction`, `detective`, `detectives`, `suspense`, `murder-mystery`, `murder`, `mystery-thriller`, `mystery-suspense`, `crime-thriller`, `cozy-mystery`.
+
+Un lecteur est retenu si `user_id % 5` vaut 1 ou 2, et s'il a noté au moins 8 livres polar. Toutes ses notes sont conservées, pas seulement les polars.
+
+Cette règle retient 20 586 lecteurs et 2 336 014 notes. Pour chaque lecteur, les 5 notes les plus récentes sont mises de côté dans `data/selection/e3_eval.csv` (évaluation). Les 5 notes juste avant vont dans `data/selection/f6_batch.csv` (import ultérieur). Le reste, 2 130 154 notes, est chargé dans la base `bookscope_app`. Les chiffres complets sont dans `data/selection/summary.json`.
+
+## Lancer le projet
+
+MongoDB 7 doit tourner sur `localhost:27017`. Avec Docker :
+
+```text
+docker run -d --name bookscope-mongo -p 27017:27017 -v bookscope-mongo-data:/data/db mongo:7
+```
+
+Puis, dans ce dossier :
+
+```text
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Télécharger l'archive et la décompresser dans `data/raw` :
+
+```text
+https://github.com/zygmuntz/goodbooks-10k/releases/download/v1.0/goodbooks-10k.zip
+```
+
+Les fichiers attendus sont `books.csv`, `ratings.csv`, `to_read.csv`, `book_tags.csv` et `tags.csv`.
+
+```text
+.venv\Scripts\python.exe scripts\load_raw.py
+.venv\Scripts\python.exe scripts\prepare_selection.py
+```
+
+`load_raw.py` remplit la base complète `bookscope`. `prepare_selection.py` relit les CSV, réécrit les fichiers de `data/selection` et remplit `bookscope_app`.
+
+## F1 — explorer un livre
+
+```text
+.venv\Scripts\python.exe scripts\explore_book.py 258
+.venv\Scripts\python.exe scripts\explore_book.py "Selected Poems"
+```
+
+Un titre qui correspond à plusieurs livres est affiché tel quel, sans en choisir un. Pour un livre unique, le service montre la fiche, les livres liés par des lecteurs qui ont mis au moins 4/5 aux deux, et les livres liés par des tags de contenu. Un tag de statut (`to-read`, `favorites`) ou un tag présent sur au moins la moitié du catalogue (`fiction`) ne suffit pas à justifier un lien. Chaque lien par les lecteurs cite des `user_id`, des notes et leur position dans `ratings.csv`.
+
+## Fichiers
+
+| Chemin | Rôle |
+|---|---|
+| `scripts/selection_rule.py` | constantes de la règle de sélection |
+| `scripts/load_raw.py` | chargement du jeu complet dans `bookscope` |
+| `scripts/prepare_selection.py` | coupe E3 / F6 et chargement de `bookscope_app` |
+| `scripts/explore_book.py` | commande du service F1 |
+| `bookscope/f1.py` | calcul des liens |
+| `bookscope/tags.py` | tags de statut et tags trop généraux |
+| `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |
