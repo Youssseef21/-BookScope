@@ -70,6 +70,14 @@ Un titre qui correspond à plusieurs livres est affiché tel quel, sans en chois
 
 Une note est identifiée par le couple lecteur + livre. Un couple nouveau est ajouté. Le même couple avec la même note est ignoré : relancer le fichier ne change rien. Si le couple existe déjà avec une note différente, la note en base reste celle lue par les autres services, et la note reçue est conservée dans `rating_conflicts`. Un lecteur absent de la sélection, ou un livre absent du catalogue, est refusé.
 
+## Deux façons de ranger les notes
+
+Les services lisent une collection où chaque note est un document. Une autre collection, `readers_embedded`, range les mêmes notes dans un document par lecteur. `scripts/measure_model.py` reconstruit cette collection, vérifie que le nombre de notes est identique, puis mesure deux requêtes : un échauffement, 11 répétitions, et la médiane.
+
+Sur cet essai, l'historique du lecteur 1 (112 notes) prend 0,59 ms avec un document par lecteur et 1,45 ms avec une note par document. Les notes d'au moins 4/5 du livre 258 (987 notes) prennent 5,5 ms avec une note par document et 56 ms avec un document par lecteur. Le détail est dans `data/measurements/model_tradeoff.json`.
+
+Les services qui partent d'un livre gardent donc une note par document. L'historique d'un lecteur reste rapide dans les deux rangements.
+
 ## Fichiers
 
 | Chemin | Rôle |
@@ -83,6 +91,7 @@ Une note est identifiée par le couple lecteur + livre. Un couple nouveau est aj
 | `scripts/trace_books.py` | commande du service F4 |
 | `scripts/link_interests.py` | commande du service F5 |
 | `scripts/import_batch.py` | commande du service F6 |
+| `scripts/measure_model.py` | comparaison des deux rangements de notes |
 | `scripts/serve.py` | page web locale |
 | `bookscope/f1.py` | calcul des liens d'un livre |
 | `bookscope/f2.py` | comparaison de deux lecteurs |
@@ -93,3 +102,4 @@ Une note est identifiée par le couple lecteur + livre. Un couple nouveau est aj
 | `bookscope/web.py` | interface |
 | `bookscope/tags.py` | tags de statut et tags trop généraux |
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |
+| `data/measurements/model_tradeoff.json` | temps mesurés pour les deux rangements |
