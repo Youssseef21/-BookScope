@@ -50,7 +50,7 @@ Avec MongoDB déjà chargé :
 .venv\Scripts\python.exe scripts\serve.py
 ```
 
-La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comparer deux lecteurs, de proposer des livres, de relier deux livres et de relier deux thèmes. Un calcul peut prendre quelques secondes.
+La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comparer deux lecteurs, de proposer des livres, de relier deux livres, de relier deux thèmes et d'importer un lot de notes. Un calcul peut prendre quelques secondes.
 
 ## F1 — explorer un livre
 
@@ -60,6 +60,15 @@ La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comp
 ```
 
 Un titre qui correspond à plusieurs livres est affiché tel quel, sans en choisir un. Pour un livre unique, le service montre la fiche, les livres liés par des lecteurs qui ont mis au moins 4/5 aux deux, et les livres liés par des tags de contenu. Un tag de statut (`to-read`, `favorites`) ou un tag présent sur au moins la moitié du catalogue (`fiction`) ne suffit pas à justifier un lien. Chaque lien par les lecteurs cite des `user_id`, des notes et leur position dans `ratings.csv`.
+
+## F6 — importer des notes
+
+```text
+.venv\Scripts\python.exe scripts\import_batch.py
+.venv\Scripts\python.exe scripts\import_batch.py data\selection\f6_batch.csv
+```
+
+Une note est identifiée par le couple lecteur + livre. Un couple nouveau est ajouté. Le même couple avec la même note est ignoré : relancer le fichier ne change rien. Si le couple existe déjà avec une note différente, la note en base reste celle lue par les autres services, et la note reçue est conservée dans `rating_conflicts`. Un lecteur absent de la sélection, ou un livre absent du catalogue, est refusé.
 
 ## Fichiers
 
@@ -73,12 +82,14 @@ Un titre qui correspond à plusieurs livres est affiché tel quel, sans en chois
 | `scripts/recommend.py` | commande du service F3 |
 | `scripts/trace_books.py` | commande du service F4 |
 | `scripts/link_interests.py` | commande du service F5 |
+| `scripts/import_batch.py` | commande du service F6 |
 | `scripts/serve.py` | page web locale |
 | `bookscope/f1.py` | calcul des liens d'un livre |
 | `bookscope/f2.py` | comparaison de deux lecteurs |
 | `bookscope/f3.py` | recommandations |
 | `bookscope/f4.py` | chemin entre deux livres |
 | `bookscope/f5.py` | lien entre deux thèmes |
+| `bookscope/f6.py` | import d'un lot de notes |
 | `bookscope/web.py` | interface |
 | `bookscope/tags.py` | tags de statut et tags trop généraux |
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |

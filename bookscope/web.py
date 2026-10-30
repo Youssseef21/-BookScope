@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from bookscope.db import connect
@@ -12,9 +13,12 @@ from bookscope.f2 import compare
 from bookscope.f3 import recommend
 from bookscope.f4 import trace
 from bookscope.f5 import link_interests
+from bookscope.f6 import import_file
 
 HOST = "127.0.0.1"
 PORT = 8000
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BATCH = ROOT / "data" / "selection" / "f6_batch.csv"
 
 
 def main() -> None:
@@ -55,6 +59,20 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
+    def do_POST(self) -> None:
+        parsed = urlparse(self.path)
+        length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(length).decode("utf-8")
+        params = parse_qs(raw)
+        try:
+            if parsed.path == "/import":
+                body = render_import(params)
+            else:
+                self._send(404, page("Introuvable", "<p>Cette page n'existe pas.</p>"))
+                return
+        except Exception as error:
+            body = f"<p class='warn'>La base n'a pas répondu. {esc(error)}</p>"
+        self._send(200, page("BookScope", body))
 
     def log_message(self, format: str, *args) -> None:
         print(f"{self.address_string()} {format % args}", flush=True)
@@ -448,6 +466,70 @@ def _bridge_html(rows: list[dict]) -> str:
     return "<ul>" + "".join(items) + "</ul>"
 
 
+def render_import(params: dict[str, list[str]]) -> str:
+    given = one(params, "batch") or str(DEFAULT_BATCH)
+    try:
+        path = _batch_path(given)
+    except ValueError:
+        return "<p class='warn'>Le fichier doit être un CSV dans le dossier du projet.</p>"
+    result = import_file(database(), path)
+    status = result["status"]
+    if status == "not_found":
+        return f"<p class='warn'>Fichier introuvable : {esc(result['path'])}</p>"
+    if status == "invalid_file":
+        return f"<p class='warn'>Fichier illisible : {esc(result['reason'])}</p>"
+    blocks = [
+        "<h2>Import des notes</h2>",
+        "<p>Une note déjà présente avec le même score n'est pas recopiée. "
+        "Si le score est différent, l'ancienne note reste celle utilisée par les autres services, "
+        "et la nouvelle est conservée à part.</p>",
+        "<ul>"
+        f"<li>Lignes lues : {result['rows']}</li>"
+        f"<li>Notes ajoutées : {result['inserted']}</li>"
+        f"<li>Déjà présentes, même note : {result['already_present']}</li>"
+        f"<li>Notes différentes, conservées à part : {result['conflicts']}</li>"
+        f"<li>Notes différentes, déjà signalées : {result['conflicts_already_recorded']}</li>"
+        f"<li>Lignes refusées : {result['rejected']}</li>"
+        f"<li>Notes en base : {result['ratings_before']} puis {result['ratings_after']}</li>"
+        "</ul>",
+    ]
+    if result["inserted_examples"]:
+        items = "".join(
+            "<li>"
+            f"lecteur {row['user_id']}, livre {row['book_id']}, "
+            f"{row['rating']}/5, position {row['source_row']}"
+            "</li>"
+            for row in result["inserted_examples"]
+        )
+        blocks.append(f"<h3>Exemples ajoutés</h3><ul>{items}</ul>")
+    if result["conflict_examples"]:
+        items = "".join(
+            "<li>"
+            f"lecteur {row['user_id']}, livre {row['book_id']} : "
+            f"{row['stored_rating']}/5 conservée, {row['incoming_rating']}/5 enregistrée à part"
+            "</li>"
+            for row in result["conflict_examples"]
+        )
+        blocks.append(f"<h3>Notes différentes</h3><ul>{items}</ul>")
+    if result["rejected_examples"]:
+        items = "".join(
+            f"<li>ligne {row['line']} : {esc(row['reason'])}</li>"
+            for row in result["rejected_examples"]
+        )
+        blocks.append(f"<h3>Lignes refusées</h3><ul>{items}</ul>")
+    return "".join(blocks)
+
+
+def _batch_path(text: str) -> Path:
+    candidate = Path(text.strip())
+    if not candidate.is_absolute():
+        candidate = ROOT / candidate
+    resolved = candidate.resolve()
+    if not resolved.is_relative_to(ROOT) or resolved.suffix.lower() != ".csv":
+        raise ValueError(text)
+    return resolved
+
+
 def esc(value) -> str:
     return html.escape("" if value is None else str(value))
 
@@ -521,6 +603,12 @@ a {{ color: #6e2b23; }}
 <label for="r">Second thème</label>
 <input id="r" name="r" placeholder="historical-fiction">
 <button>Relier les thèmes</button>
+</form>
+<form action="/import" method="post">
+<h2>Importer des notes</h2>
+<label for="batch">Fichier CSV</label>
+<input id="batch" name="batch" value="data/selection/f6_batch.csv">
+<button>Importer</button>
 </form>
 </section>
 <section>{result}</section>
