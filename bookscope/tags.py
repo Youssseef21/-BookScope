@@ -34,6 +34,8 @@ STATUS_TAGS = frozenset(
         "book-club",
         "bookclub",
         "favorite-books",
+        "faves",
+        "favs",
         "shelfari-favorites",
         "wish-list",
         "wishlist",

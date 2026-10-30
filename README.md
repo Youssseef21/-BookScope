@@ -42,6 +42,16 @@ Les fichiers attendus sont `books.csv`, `ratings.csv`, `to_read.csv`, `book_tags
 
 `load_raw.py` remplit la base complète `bookscope`. `prepare_selection.py` relit les CSV, réécrit les fichiers de `data/selection` et remplit `bookscope_app`.
 
+## Interface
+
+Avec MongoDB déjà chargé :
+
+```text
+.venv\Scripts\python.exe scripts\serve.py
+```
+
+La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comparer deux lecteurs et de proposer des livres. Un calcul peut prendre quelques secondes.
+
 ## F1 — explorer un livre
 
 ```text
@@ -59,6 +69,12 @@ Un titre qui correspond à plusieurs livres est affiché tel quel, sans en chois
 | `scripts/load_raw.py` | chargement du jeu complet dans `bookscope` |
 | `scripts/prepare_selection.py` | coupe E3 / F6 et chargement de `bookscope_app` |
 | `scripts/explore_book.py` | commande du service F1 |
-| `bookscope/f1.py` | calcul des liens |
+| `scripts/compare_readers.py` | commande du service F2 |
+| `scripts/recommend.py` | commande du service F3 |
+| `scripts/serve.py` | page web locale |
+| `bookscope/f1.py` | calcul des liens d'un livre |
+| `bookscope/f2.py` | comparaison de deux lecteurs |
+| `bookscope/f3.py` | recommandations |
+| `bookscope/web.py` | interface |
 | `bookscope/tags.py` | tags de statut et tags trop généraux |
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |
