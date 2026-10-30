@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-30",
+  "prediction_file": "data/measurements/e2_prediction.txt",
+  "hardware": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "cpu_count": 8,
+    "python": "3.12.10",
+    "mongo": "8.3.11"
+  },
+  "protocol": {
+    "subsets": "préfixes imbriqués de ratings.csv, le plus grand est le fichier entier",
+    "catalogue": "les 10 000 livres sont chargés dans chaque sous-ensemble",
+    "load_time": "insertions puis index, un seul passage",
+    "services": "F2 puis F1, un appel d'échauffement non compté, puis 5 mesures",
+    "same_requests": true
+  },
+  "subsets": [
+    {
+      "database": "e1_200k",
+      "rating_limit": 200000,
+      "readers": 3374,
+      "books_in_catalogue": 10000,
+      "books_with_ratings": 5620,
+      "ratings": 200000,
+      "load_seconds": 9.131,
+      "storage_bytes": {
+        "data": 75030410.0,
+        "indexes": 10821632.0,
+        "storage": 16650240.0
+      },
+      "services": {
+        "f2": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 10.034,
+          "min_ms": 9.159,
+          "max_ms": 12.24,
+          "samples_ms": [
+            9.504,
+            12.24,
+            9.159,
+            10.034,
+            11.398
+          ],
+          "result": {
+            "status": "ok",
+            "shared_books": 57,
+            "ratings_used": [
+              185,
+              183
+            ]
+          }
+        },
+        "f1": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 3263.421,
+          "min_ms": 3126.32,
+          "max_ms": 6875.549,
+          "samples_ms": [
+            3263.421,
+            4350.585,
+            6875.549,
+            3182.612,
+            3126.32
+          ],
+          "result": {
+            "status": "ok",
+            "ratings_in_selection": 1246
+          }
+        }
+      },
+      "requests": {
+        "user_a": 2276,
+        "user_b": 4606,
+        "book_id": 26
+      }
+    },
+    {
+      "database": "e1_1m",
+      "rating_limit": 1000000,
+      "readers": 12586,
+      "books_in_catalogue": 10000,
+      "books_with_ratings": 7708,
+      "ratings": 1000000,
+      "load_seconds": 30.538,
+      "storage_bytes": {
+        "data": 135830410.0,
+        "indexes": 30642176.0,
+        "storage": 41349120.0
+      },
+      "services": {
+        "f2": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 17.417,
+          "min_ms": 16.614,
+          "max_ms": 18.735,
+          "samples_ms": [
+            17.196,
+            16.614,
+            17.417,
+            17.789,
+            18.735
+          ],
+          "result": {
+            "status": "ok",
+            "shared_books": 57,
+            "ratings_used": [
+              185,
+              184
+            ]
+          }
+        },
+        "f1": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 6518.398,
+          "min_ms": 5429.906,
+          "max_ms": 12323.312,
+          "samples_ms": [
+            10081.958,
+            5429.906,
+            6518.398,
+            12323.312,
+            5612.105
+          ],
+          "result": {
+            "status": "ok",
+            "ratings_in_selection": 4593
+          }
+        }
+      },
+      "requests": {
+        "user_a": 2276,
+        "user_b": 4606,
+        "book_id": 26
+      }
+    },
+    {
+      "database": "e1_all",
+      "rating_limit": null,
+      "readers": 53424,
+      "books_in_catalogue": 10000,
+      "books_with_ratings": 10000,
+      "ratings": 5976479,
+      "load_seconds": 173.71,
+      "storage_bytes": {
+        "data": 514042814.0,
+        "indexes": 171683840.0,
+        "storage": 166739968.0
+      },
+      "services": {
+        "f2": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 59.344,
+          "min_ms": 54.113,
+          "max_ms": 67.033,
+          "samples_ms": [
+            67.033,
+            58.482,
+            61.859,
+            59.344,
+            54.113
+          ],
+          "result": {
+            "status": "ok",
+            "shared_books": 57,
+            "ratings_used": [
+              185,
+              184
+            ]
+          }
+        },
+        "f1": {
+          "warmup": "one untimed call",
+          "repeats": 5,
+          "median_ms": 27313.404,
+          "min_ms": 25666.979,
+          "max_ms": 27999.929,
+          "samples_ms": [
+            27999.929,
+            27629.469,
+            26387.556,
+            27313.404,
+            25666.979
+          ],
+          "result": {
+            "status": "ok",
+            "ratings_in_selection": 13072
+          }
+        }
+      },
+      "requests": {
+        "user_a": 2276,
+        "user_b": 4606,
+        "book_id": 26
+      }
+    }
+  ]
+}

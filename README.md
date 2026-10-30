@@ -102,6 +102,18 @@ Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne rép
 
 `data/measurements/e2_prediction.txt` a été écrit avant les mesures de temps. La charge personnalisée est F2 et F3. La charge d'exploration est F1 et F4. Le serveur unique est attendu le plus rapide dans les deux cas. Entre les deux répartitions, celle par lecteur est attendue plus rapide pour un lecteur, et celle par livre pour un livre.
 
+## E1 — trois tailles
+
+Les trois jeux sont des préfixes de `ratings.csv`, dans l'ordre du fichier. Le plus grand contient les 5 976 479 notes. Les 10 000 livres sont chargés à chaque fois. Le temps de chargement inclut les index. F2 et F1 sont mesurés sur les mêmes entrées : lecteurs 2276 et 4606, livre 26 (*The Da Vinci Code*). Un appel d'échauffement, puis 5 mesures, et la médiane. Le détail est dans `data/measurements/e1.json`.
+
+| Notes | Lecteurs | Livres notés | Chargement | Disque | F2 | F1 |
+|---|---:|---:|---:|---:|---:|---:|
+| 200 000 | 3 374 | 5 620 | 9,1 s | 17 Mo | 10 ms | 3,3 s |
+| 1 000 000 | 12 586 | 7 708 | 31 s | 41 Mo | 17 ms | 6,5 s |
+| 5 976 479 | 53 424 | 10 000 | 174 s | 167 Mo | 59 ms | 27 s |
+
+Les deux lecteurs ont déjà presque tout leur historique dans le premier préfixe : 185 et 183 notes, 57 livres en commun. F2 ralentit quand même, parce que la popularité de ces livres est recomptée sur un fichier plus grand. F1 suit le nombre de notes du livre 26 : 1 246, puis 4 593, puis 13 072.
+
 ## Fichiers
 
 | Chemin | Rôle |
@@ -118,6 +130,7 @@ Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne rép
 | `scripts/measure_model.py` | comparaison des deux rangements de notes |
 | `scripts/load_distributed.py` | copie des livres et répartition des notes |
 | `scripts/compare_distributed.py` | comparaison avec le serveur unique |
+| `scripts/measure_e1.py` | temps de chargement et de services sur trois tailles |
 | `scripts/serve.py` | page web locale |
 | `bookscope/f1.py` | calcul des liens d'un livre |
 | `bookscope/f2.py` | comparaison de deux lecteurs |
@@ -132,3 +145,4 @@ Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne rép
 | `data/measurements/model_tradeoff.json` | temps mesurés pour les deux rangements |
 | `data/measurements/distributed.json` | égalité des résultats et échanges entre instances |
 | `data/measurements/e2_prediction.txt` | prédiction E2, déposée avant les mesures |
+| `data/measurements/e1.json` | temps E1 sur trois tailles de notes |
