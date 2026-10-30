@@ -98,6 +98,10 @@ Pour une question qui part d'un lecteur, la répartition par lecteur lit son his
 
 Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne répondent pas. Une partie de ses notes est sur B, et cette partie n'est pas présentée comme un résultat complet.
 
+## Prédiction E2
+
+`data/measurements/e2_prediction.txt` a été écrit avant les mesures de temps. La charge personnalisée est F2 et F3. La charge d'exploration est F1 et F4. Le serveur unique est attendu le plus rapide dans les deux cas. Entre les deux répartitions, celle par lecteur est attendue plus rapide pour un lecteur, et celle par livre pour un livre.
+
 ## Fichiers
 
 | Chemin | Rôle |
@@ -127,3 +131,4 @@ Si B est arrêté, F2 puis F3 sur le lecteur 1 en répartition par livre ne rép
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |
 | `data/measurements/model_tradeoff.json` | temps mesurés pour les deux rangements |
 | `data/measurements/distributed.json` | égalité des résultats et échanges entre instances |
+| `data/measurements/e2_prediction.txt` | prédiction E2, déposée avant les mesures |

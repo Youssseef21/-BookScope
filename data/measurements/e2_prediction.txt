@@ -1,0 +1,22 @@
+Prédiction E2, écrite avant toute mesure de cette expérience.
+Date : 30 octobre 2026.
+Auteur : Youssef Harrane, M2 SLCD.
+
+Les temps de E2 ne sont pas encore mesurés. Cette prédiction s'appuie seulement sur l'emplacement des notes.
+
+Le plus grand jeu de E1 sera toutes les notes de ratings.csv. Les trois configurations comparées seront :
+- le serveur MongoDB unique ;
+- deux instances, notes réparties par lecteur (user_id pair sur A, impair sur B) ;
+- deux instances, notes réparties par livre (book_id pair sur A, impair sur B).
+
+Charge personnalisée : F2, comparer deux lecteurs, et F3, proposer des livres à un lecteur.
+Charge d'exploration : F1, explorer un livre, et F4, relier deux livres.
+Les mêmes lecteurs et les mêmes livres seront soumis aux trois configurations.
+
+Prédiction pour la charge personnalisée.
+Le serveur unique devrait être le plus rapide. Les deux instances tournent sur le même ordinateur et se partagent le processeur, la mémoire et le disque. L'application doit en plus fusionner les réponses.
+Entre les deux répartitions, celle par lecteur devrait être plus rapide que celle par livre. Toutes les notes d'un lecteur sont alors sur une seule instance. Avec la répartition par livre, l'historique du lecteur 1 est coupé : 58 notes sur A et 54 sur B.
+
+Prédiction pour la charge d'exploration.
+Le serveur unique devrait encore être le plus rapide, pour la même raison matérielle.
+Entre les deux répartitions, celle par livre devrait être plus rapide que celle par lecteur. Toutes les notes d'un livre sont alors sur une seule instance. Le livre 258 est entier sur A dans ce découpage, alors qu'il est coupé en 648 et 668 notes dans le découpage par lecteur.
