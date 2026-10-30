@@ -50,7 +50,7 @@ Avec MongoDB déjà chargé :
 .venv\Scripts\python.exe scripts\serve.py
 ```
 
-La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comparer deux lecteurs, de proposer des livres et de relier deux livres. Un calcul peut prendre quelques secondes.
+La page est sur http://127.0.0.1:8000 . Elle permet d'explorer un livre, de comparer deux lecteurs, de proposer des livres, de relier deux livres et de relier deux thèmes. Un calcul peut prendre quelques secondes.
 
 ## F1 — explorer un livre
 
@@ -72,11 +72,13 @@ Un titre qui correspond à plusieurs livres est affiché tel quel, sans en chois
 | `scripts/compare_readers.py` | commande du service F2 |
 | `scripts/recommend.py` | commande du service F3 |
 | `scripts/trace_books.py` | commande du service F4 |
+| `scripts/link_interests.py` | commande du service F5 |
 | `scripts/serve.py` | page web locale |
 | `bookscope/f1.py` | calcul des liens d'un livre |
 | `bookscope/f2.py` | comparaison de deux lecteurs |
 | `bookscope/f3.py` | recommandations |
 | `bookscope/f4.py` | chemin entre deux livres |
+| `bookscope/f5.py` | lien entre deux thèmes |
 | `bookscope/web.py` | interface |
 | `bookscope/tags.py` | tags de statut et tags trop généraux |
 | `data/selection/` | lecteurs retenus, livres polar, lots E3 et F6 |

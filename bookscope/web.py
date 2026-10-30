@@ -11,6 +11,7 @@ from bookscope.f1 import explore
 from bookscope.f2 import compare
 from bookscope.f3 import recommend
 from bookscope.f4 import trace
+from bookscope.f5 import link_interests
 
 HOST = "127.0.0.1"
 PORT = 8000
@@ -37,6 +38,8 @@ class Handler(BaseHTTPRequestHandler):
                 body = render_recommend(params)
             elif parsed.path == "/trace":
                 body = render_trace(params)
+            elif parsed.path == "/interests":
+                body = render_interests(params)
             else:
                 self._send(404, page("Introuvable", "<p>Cette page n'existe pas.</p>"))
                 return
@@ -51,6 +54,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
+
 
     def log_message(self, format: str, *args) -> None:
         print(f"{self.address_string()} {format % args}", flush=True)
@@ -375,6 +379,75 @@ def render_trace(params: dict[str, list[str]]) -> str:
     return "".join(blocks)
 
 
+def render_interests(params: dict[str, list[str]]) -> str:
+    left = one(params, "p")
+    right = one(params, "r")
+    if not left or not right:
+        return "<p class='warn'>Indiquez deux thèmes.</p>"
+    result = link_interests(database(), left, right)
+    status = result["status"]
+    if status == "not_found":
+        return f"<p class='warn'>Aucun tag pour « {esc(result['query'])} ».</p>"
+    if status == "ambiguous":
+        items = "".join(
+            f"<li>{esc(name)} — {books} livres</li>" for name, books in result["matches"]
+        )
+        return f"<h2>Plusieurs tags correspondent à « {esc(result['query'])} »</h2><ul>{items}</ul>"
+    if status == "not_a_theme":
+        why = "un statut de lecture" if result["reason"] == "status" else "un tag présent sur trop de livres"
+        return f"<p class='warn'>« {esc(result['query'])} » n'est pas un thème : c'est {why}.</p>"
+    if status == "same_interest":
+        return "<p class='warn'>Il faut deux thèmes différents.</p>"
+    sentences = {
+        "persists": "Le lien reste visible sans les livres les plus notés ni les lecteurs très actifs.",
+        "weakens": "Le lien faiblit quand on écarte les livres les plus notés et les lecteurs très actifs.",
+        "disappears": "Le lien apparent disparaît sans les livres les plus notés et les lecteurs très actifs.",
+        "none": "Pas de lien convaincant entre ces deux intérêts.",
+    }
+    blocks = [
+        f"<h2>{esc(result['interest_a']['name'])} et {esc(result['interest_b']['name'])}</h2>",
+        f"<p>{sentences[result['persistence']]}</p>",
+        f"<p>Lecteurs qui ont aimé un livre de chaque côté : {result['readers_full']}. "
+        f"Après filtrage : {result['readers_discounted']}.</p>",
+        "<h3>Livres qui portent les deux tags</h3>",
+        _bridge_html(result["bridges"]),
+        "<h3>Sans le top 100 ni les lecteurs très actifs</h3>",
+        _bridge_html(result["bridges_discounted"]),
+        "<h3>Exemples de lecteurs</h3>",
+    ]
+    if not result["reader_examples"]:
+        blocks.append("<p>Aucun.</p>")
+    else:
+        items = []
+        for example in result["reader_examples"]:
+            book_a = example["book_a"]
+            book_b = example["book_b"]
+            items.append(
+                "<li>"
+                f"lecteur {example['user_id']} : "
+                f"{book_a['rating']}/5 à « {esc(book_a['title'])} » (position {book_a['source_row']}), "
+                f"{book_b['rating']}/5 à « {esc(book_b['title'])} » (position {book_b['source_row']})"
+                "</li>"
+            )
+        blocks.append("<ul>" + "".join(items) + "</ul>")
+    return "".join(blocks)
+
+
+def _bridge_html(rows: list[dict]) -> str:
+    if not rows:
+        return "<p>Aucun.</p>"
+    items = []
+    for row in rows:
+        place = "dans le top 100" if row["in_top_100"] else "hors du top 100"
+        items.append(
+            "<li>"
+            f"{row['book_id']} — {esc(row['title'])} — "
+            f"{row['positive_readers']} lecteurs à 4 ou 5, {place}"
+            "</li>"
+        )
+    return "<ul>" + "".join(items) + "</ul>"
+
+
 def esc(value) -> str:
     return html.escape("" if value is None else str(value))
 
@@ -440,6 +513,14 @@ a {{ color: #6e2b23; }}
 <label for="y">Second livre</label>
 <input id="y" name="y" placeholder="1467">
 <button>Relier</button>
+</form>
+<form action="/interests">
+<h2>Relier deux thèmes</h2>
+<label for="p">Premier thème</label>
+<input id="p" name="p" placeholder="mystery">
+<label for="r">Second thème</label>
+<input id="r" name="r" placeholder="historical-fiction">
+<button>Relier les thèmes</button>
 </form>
 </section>
 <section>{result}</section>
