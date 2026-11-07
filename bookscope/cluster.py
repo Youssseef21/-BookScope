@@ -40,7 +40,7 @@ class Instance:
         self.name = name
         self.endpoint = endpoint
         self.uri = uri
-        self.client = MongoClient(uri, serverSelectionTimeoutMS=2000, connectTimeoutMS=2000)
+        self.client = MongoClient(uri, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000)
         self.db = self.client[database]
         self.available = False
 

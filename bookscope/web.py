@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import html
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from bookscope.cluster import PLACEMENTS, Cluster
 from bookscope.db import connect
 from bookscope.f1 import explore
 from bookscope.f2 import compare
@@ -19,11 +21,20 @@ HOST = "127.0.0.1"
 PORT = 8000
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BATCH = ROOT / "data" / "selection" / "f6_batch.csv"
+DISTRIBUTED = False
+_request = threading.local()
 
 
-def main() -> None:
+def main(port: int | None = None, distributed: bool = False) -> None:
+    global PORT, DISTRIBUTED
+    DISTRIBUTED = distributed
+    if port is not None:
+        PORT = port
+    elif distributed:
+        PORT = 8001
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    print(f"BookScope : http://{HOST}:{PORT}", flush=True)
+    label = "deux instances" if distributed else "serveur unique"
+    print(f"BookScope ({label}) : http://{HOST}:{PORT}", flush=True)
     server.serve_forever()
 
 
@@ -34,6 +45,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         params = parse_qs(parsed.query)
+        bind_placement(params)
         try:
             if parsed.path == "/":
                 body = ""
@@ -67,6 +79,7 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length).decode("utf-8")
         params = parse_qs(raw)
+        bind_placement(params)
         try:
             if parsed.path == "/import":
                 body = render_import(params)
@@ -81,8 +94,30 @@ class Handler(BaseHTTPRequestHandler):
         print(f"{self.address_string()} {format % args}", flush=True)
 
 
+def bind_placement(params: dict[str, list[str]]) -> None:
+    raw = one(params, "placement")
+    _request.placement = raw if raw in PLACEMENTS else "by_reader"
+
+
+def current_placement() -> str:
+    value = getattr(_request, "placement", "by_reader")
+    return value if value in PLACEMENTS else "by_reader"
+
+
 def database():
-    return connect()
+    if not DISTRIBUTED:
+        return connect()
+    # Les mêmes fonctions F1 à F6 lisent les deux instances.
+    # Les livres sont copiés des deux côtés ; chaque note n'est que d'un côté.
+    cluster = Cluster(current_placement())
+    cluster.refresh()
+    return cluster
+
+
+def explore_href(book_id: int) -> str:
+    if not DISTRIBUTED:
+        return f"/explore?q={book_id}"
+    return f"/explore?q={book_id}&placement={current_placement()}"
 
 
 def one(params: dict[str, list[str]], name: str) -> str:
@@ -101,7 +136,7 @@ def render_explore(params: dict[str, list[str]]) -> str:
     if status == "ambiguous":
         items = []
         for book in result["matches"]:
-            href = f"/explore?q={book['book_id']}"
+            href = explore_href(book["book_id"])
             items.append(
                 f"<li><a href='{href}'>{book['book_id']}</a> — {esc(book['title'])} — {esc(book['authors'])}</li>"
             )
@@ -176,17 +211,7 @@ def render_compare(params: dict[str, list[str]]) -> str:
         user_b = int(one(params, "b"))
     except ValueError:
         return "<p class='warn'>Indiquez deux numéros de lecteur.</p>"
-    limits: dict[int, int] = {}
-    raw_user = one(params, "first_user")
-    raw_count = one(params, "first_k")
-    if raw_user or raw_count:
-        try:
-            limits[int(raw_user)] = int(raw_count)
-            if limits[int(raw_user)] < 1:
-                raise ValueError
-        except ValueError:
-            return "<p class='warn'>La troncature demande un lecteur et un nombre de notes supérieur à 0.</p>"
-    result = compare(database(), user_a, user_b, limits)
+    result = compare(database(), user_a, user_b)
     status = result["status"]
     if status == "same_reader":
         return "<p class='warn'>Il faut deux lecteurs différents.</p>"
@@ -344,7 +369,7 @@ def render_trace(params: dict[str, list[str]]) -> str:
         return f"<p class='warn'>Aucun livre pour « {esc(result['query'])} ».</p>"
     if status == "ambiguous":
         items = "".join(
-            f"<li><a href='/explore?q={book['book_id']}'>{book['book_id']}</a> — {esc(book['title'])} — {esc(book['authors'])}</li>"
+            f"<li><a href='{explore_href(book['book_id'])}'>{book['book_id']}</a> — {esc(book['title'])} — {esc(book['authors'])}</li>"
             for book in result["matches"]
         )
         return f"<h2>Plusieurs livres correspondent à « {esc(result['query'])} »</h2><ul>{items}</ul>"
@@ -538,6 +563,30 @@ def esc(value) -> str:
 
 
 def page(title: str, result: str) -> str:
+    placement = current_placement()
+    hidden = (
+        f'<input type="hidden" name="placement" value="{esc(placement)}">'
+        if DISTRIBUTED
+        else ""
+    )
+    if DISTRIBUTED:
+        mode = "par lecteur" if placement == "by_reader" else "par livre"
+        intro = (
+            "<p class=\"lead\">Cette page interroge les deux instances ensemble : "
+            "A sur localhost:27018 et B sur localhost:27019. Les livres sont copiés "
+            "des deux côtés. Chaque note n'est stockée que d'un côté. "
+            f"Répartition en cours : {mode}. "
+            "<a href=\"http://127.0.0.1:8000\">Serveur unique</a>.</p>"
+            "<p><a href=\"/?placement=by_reader\">Par lecteur</a> · "
+            "<a href=\"/?placement=by_book\">Par livre</a></p>"
+        )
+    else:
+        intro = (
+            "<p class=\"lead\">Exploration du catalogue à partir des notes des lecteurs retenus. "
+            "Les notes cachées pour l'évaluation ne sont pas utilisées. "
+            "L'interface branchée sur les deux instances est sur "
+            "<a href=\"http://127.0.0.1:8001\">http://127.0.0.1:8001</a>.</p>"
+        )
     return f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -563,27 +612,26 @@ a {{ color: #6e2b23; }}
 <body>
 <main>
 <h1>BookScope</h1>
-<p class="lead">Exploration du catalogue à partir des notes des lecteurs retenus. Les notes cachées pour l'évaluation et pour l'import ne sont pas utilisées.</p>
+{intro}
 <section class="forms">
 <form action="/explore">
+{hidden}
 <h2>Explorer un livre</h2>
 <label for="q">Titre ou numéro</label>
 <input id="q" name="q" placeholder="258 ou Selected Poems">
 <button>Explorer</button>
 </form>
 <form action="/compare">
+{hidden}
 <h2>Comparer deux lecteurs</h2>
 <label for="a">Lecteur A</label>
 <input id="a" name="a" placeholder="1">
 <label for="b">Lecteur B</label>
 <input id="b" name="b" placeholder="2">
-<label for="first_user">Tronquer ce lecteur (facultatif)</label>
-<input id="first_user" name="first_user" placeholder="1">
-<label for="first_k">Nombre de premières notes</label>
-<input id="first_k" name="first_k" placeholder="5">
 <button>Comparer</button>
 </form>
 <form action="/recommend">
+{hidden}
 <h2>Proposer des livres</h2>
 <label for="user">Lecteur</label>
 <input id="user" name="user" placeholder="1">
@@ -592,6 +640,7 @@ a {{ color: #6e2b23; }}
 <button>Proposer</button>
 </form>
 <form action="/trace">
+{hidden}
 <h2>Relier deux livres</h2>
 <label for="x">Premier livre</label>
 <input id="x" name="x" placeholder="258">
@@ -600,6 +649,7 @@ a {{ color: #6e2b23; }}
 <button>Relier</button>
 </form>
 <form action="/interests">
+{hidden}
 <h2>Relier deux thèmes</h2>
 <label for="p">Premier thème</label>
 <input id="p" name="p" placeholder="mystery">
@@ -608,6 +658,7 @@ a {{ color: #6e2b23; }}
 <button>Relier les thèmes</button>
 </form>
 <form action="/import" method="post">
+{hidden}
 <h2>Importer des notes</h2>
 <label for="batch">Fichier CSV</label>
 <input id="batch" name="batch" value="data/selection/f6_batch.csv">
