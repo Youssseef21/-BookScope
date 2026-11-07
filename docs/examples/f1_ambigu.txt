@@ -1,0 +1,6 @@
+Plusieurs livres correspondent à « Selected Poems ». Aucun n'est choisi.
+- 6455 — Selected Poems — Emily Dickinson
+- 8221 — Selected Poems — William Carlos Williams, Charles Tomlinson
+- 8899 — Selected Poems — George Gordon Byron, Peter J. Manning, Susan J. Wolfson
+- 9784 — Selected Poems — E.E. Cummings, Richard S. Kennedy
+Relancez avec un book_id.

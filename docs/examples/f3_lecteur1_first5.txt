@@ -1,0 +1,62 @@
+Lecteur 1 : 5 notes utilisées, dont 2 à 4 ou 5
+Historique tronqué aux 5 premières notes, sur 112 disponibles. Ce n'est pas un nouveau lecteur.
+Mode : lecteurs qui ont aimé les mêmes livres, en privilégiant les moins populaires.
+Aucune des 10 propositions ne fait partie des 100 livres les plus notés. Popularité médiane des propositions : 215.0 notes. Popularité médiane de ces 100 livres : 3604.5 notes.
+
+1. 948 — Empire Falls — Richard Russo
+   691 notes dans la sélection, hors du top 100.
+   9 lecteurs proches ont mis au moins 4/5.
+   lecteur 11256 : 4/5 (position 1140658), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 37502 : 4/5 (position 3014948), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 11632 : 4/5 (position 692966), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+2. 9247 — Palace Walk (The Cairo Trilogy #1) — Naguib Mahfouz, William M. Hutchins, Olive E. Kenny
+   43 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 11256 : 4/5 (position 4054817), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 11632 : 4/5 (position 693042), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+3. 5187 — Nobody's Fool — Richard Russo
+   146 notes dans la sélection, hors du top 100.
+   4 lecteurs proches ont mis au moins 4/5.
+   lecteur 37502 : 4/5 (position 3014954), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 836 : 4/5 (position 5640770), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 16876 : 5/5 (position 1110590), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+4. 6413 — Home (Gilead, #2) — Marilynne Robinson
+   96 notes dans la sélection, hors du top 100.
+   3 lecteurs proches ont mis au moins 4/5.
+   lecteur 15876 : 4/5 (position 1501358), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 16876 : 5/5 (position 1110585), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 52012 : 4/5 (position 5097606), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+5. 2374 — Angle of Repose — Wallace Stegner
+   284 notes dans la sélection, hors du top 100.
+   5 lecteurs proches ont mis au moins 4/5.
+   lecteur 15876 : 4/5 (position 1501344), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 6496 : 5/5 (position 405657), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 39941 : 4/5 (position 3548315), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+6. 9604 — Lawrence in Arabia: War, Deceit, Imperial Folly, and the Making of the Modern Middle East — Scott Anderson
+   45 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 37502 : 5/5 (position 5482092), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 50652 : 4/5 (position 4927814), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+7. 1011 — People of the Book — Geraldine Brooks
+   572 notes dans la sélection, hors du top 100.
+   7 lecteurs proches ont mis au moins 4/5.
+   lecteur 15876 : 4/5 (position 1501444), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 11632 : 5/5 (position 692964), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 16446 : 5/5 (position 1112486), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+8. 2128 — Plainsong (Plainsong, #1) — Kent Haruf
+   299 notes dans la sélection, hors du top 100.
+   5 lecteurs proches ont mis au moins 4/5.
+   lecteur 37502 : 4/5 (position 3014953), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 11632 : 4/5 (position 693010), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 16876 : 5/5 (position 1110588), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+9. 2107 — Suite Française — Irène Némirovsky, Sandra Smith
+   310 notes dans la sélection, hors du top 100.
+   5 lecteurs proches ont mis au moins 4/5.
+   lecteur 11632 : 4/5 (position 692980), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 14242 : 4/5 (position 1128473), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 39941 : 5/5 (position 3548255), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+10. 7155 — In the Lake of the Woods — Tim O'Brien
+   74 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 11256 : 4/5 (position 4055212), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)
+   lecteur 11632 : 5/5 (position 693039), en commun sur « Gilead (Gilead, #1) » noté 5/5 (position 79); « The Shadow of the Wind (The Cemetery of Forgotten Books,  #1) » noté 5/5 (position 1)

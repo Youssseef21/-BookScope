@@ -55,14 +55,18 @@ STATUS_TAGS = frozenset(
 
 
 def is_status(name: str) -> bool:
+    # « to-read », « favorites », « owned » : l'étagère, pas l'histoire.
+    # « 5-stars » ou « read-in-2015 » aussi : ce sont des marques de lecture.
     if name in STATUS_TAGS or name.endswith("-stars") or name.endswith("-star"):
         return True
     return name.startswith("read-in-") or name.startswith("read-")
 
 
 def is_extremely_common(name: str, books_with_tag: int, catalogue_size: int) -> bool:
+    # Un tag de statut est toujours trop vague pour justifier un lien.
     if is_status(name):
         return True
     if catalogue_size <= 0:
         return False
+    # « fiction » est sur 9097 livres sur 10000, donc au-dessus de 50 %.
     return books_with_tag / catalogue_size >= COMMON_TAG_FRACTION

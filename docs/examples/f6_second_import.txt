@@ -1,0 +1,10 @@
+Import terminé. Relancer le même fichier ne change rien.
+Une note déjà présente avec un autre score est conservée. Le score reçu est enregistré à part.
+
+Lignes lues : 102930
+Notes ajoutées : 0
+Déjà présentes, même note : 102930
+Notes différentes, conservées à part : 0
+Notes différentes, déjà signalées : 0
+Lignes refusées : 0
+Notes en base : 2233084 puis 2233084

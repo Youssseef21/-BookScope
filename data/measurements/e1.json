@@ -1,12 +1,12 @@
 {
-  "date": "2026-10-30",
+  "date": "2026-11-06",
   "prediction_file": "data/measurements/e2_prediction.txt",
   "hardware": {
     "platform": "Windows-11-10.0.26300-SP0",
-    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
-    "cpu_count": 8,
+    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
+    "cpu_count": 16,
     "python": "3.12.10",
-    "mongo": "8.3.11"
+    "mongo": "7.0.45"
   },
   "protocol": {
     "subsets": "préfixes imbriqués de ratings.csv, le plus grand est le fichier entier",
@@ -23,25 +23,25 @@
       "books_in_catalogue": 10000,
       "books_with_ratings": 5620,
       "ratings": 200000,
-      "load_seconds": 9.131,
+      "load_seconds": 5.433,
       "storage_bytes": {
         "data": 75030410.0,
-        "indexes": 10821632.0,
-        "storage": 16650240.0
+        "indexes": 11976704.0,
+        "storage": 13320192.0
       },
       "services": {
         "f2": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 10.034,
-          "min_ms": 9.159,
-          "max_ms": 12.24,
+          "median_ms": 17.863,
+          "min_ms": 15.51,
+          "max_ms": 18.608,
           "samples_ms": [
-            9.504,
-            12.24,
-            9.159,
-            10.034,
-            11.398
+            17.863,
+            18.608,
+            17.316,
+            15.51,
+            18.566
           ],
           "result": {
             "status": "ok",
@@ -55,15 +55,15 @@
         "f1": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 3263.421,
-          "min_ms": 3126.32,
-          "max_ms": 6875.549,
+          "median_ms": 2755.785,
+          "min_ms": 2518.266,
+          "max_ms": 2964.408,
           "samples_ms": [
-            3263.421,
-            4350.585,
-            6875.549,
-            3182.612,
-            3126.32
+            2613.649,
+            2518.266,
+            2964.408,
+            2785.447,
+            2755.785
           ],
           "result": {
             "status": "ok",
@@ -84,25 +84,25 @@
       "books_in_catalogue": 10000,
       "books_with_ratings": 7708,
       "ratings": 1000000,
-      "load_seconds": 30.538,
+      "load_seconds": 16.159,
       "storage_bytes": {
         "data": 135830410.0,
-        "indexes": 30642176.0,
-        "storage": 41349120.0
+        "indexes": 32436224.0,
+        "storage": 39636992.0
       },
       "services": {
         "f2": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 17.417,
-          "min_ms": 16.614,
-          "max_ms": 18.735,
+          "median_ms": 40.541,
+          "min_ms": 37.953,
+          "max_ms": 43.178,
           "samples_ms": [
-            17.196,
-            16.614,
-            17.417,
-            17.789,
-            18.735
+            37.953,
+            43.178,
+            40.541,
+            40.214,
+            42.085
           ],
           "result": {
             "status": "ok",
@@ -116,15 +116,15 @@
         "f1": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 6518.398,
-          "min_ms": 5429.906,
-          "max_ms": 12323.312,
+          "median_ms": 5912.388,
+          "min_ms": 5793.591,
+          "max_ms": 6105.029,
           "samples_ms": [
-            10081.958,
-            5429.906,
-            6518.398,
-            12323.312,
-            5612.105
+            5912.388,
+            5840.622,
+            5793.591,
+            6105.029,
+            5920.999
           ],
           "result": {
             "status": "ok",
@@ -145,25 +145,25 @@
       "books_in_catalogue": 10000,
       "books_with_ratings": 10000,
       "ratings": 5976479,
-      "load_seconds": 173.71,
+      "load_seconds": 86.305,
       "storage_bytes": {
         "data": 514042814.0,
-        "indexes": 171683840.0,
-        "storage": 166739968.0
+        "indexes": 171925504.0,
+        "storage": 161746944.0
       },
       "services": {
         "f2": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 59.344,
-          "min_ms": 54.113,
-          "max_ms": 67.033,
+          "median_ms": 134.475,
+          "min_ms": 133.728,
+          "max_ms": 136.726,
           "samples_ms": [
-            67.033,
-            58.482,
-            61.859,
-            59.344,
-            54.113
+            136.726,
+            134.128,
+            134.475,
+            133.728,
+            135.562
           ],
           "result": {
             "status": "ok",
@@ -177,15 +177,15 @@
         "f1": {
           "warmup": "one untimed call",
           "repeats": 5,
-          "median_ms": 27313.404,
-          "min_ms": 25666.979,
-          "max_ms": 27999.929,
+          "median_ms": 27688.736,
+          "min_ms": 27212.734,
+          "max_ms": 28736.135,
           "samples_ms": [
-            27999.929,
-            27629.469,
-            26387.556,
-            27313.404,
-            25666.979
+            28042.101,
+            28736.135,
+            27688.736,
+            27212.734,
+            27550.519
           ],
           "result": {
             "status": "ok",

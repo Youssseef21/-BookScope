@@ -1,0 +1,20 @@
+Lecteur A 1 : 112 notes utilisées
+Lecteur B 2 : 60 notes utilisées
+
+Livres en commun : 6. Recouvrement avec l'historique le plus court : 0.1. Accord pondéré (les livres très notés pèsent moins) : 0.8298. Force du lien : 0.083.
+
+Accords (5)
+- 128 — Steve Jobs — Walter Isaacson
+  lecteur 1 : 5/5 (position 1936423), lecteur 2 : 5/5 (position 2730345), écart 0, 635 notes dans la sélection
+- 131 — The Grapes of Wrath — John Steinbeck
+  lecteur 1 : 4/5 (position 999516), lecteur 2 : 5/5 (position 2938740), écart 1, 2834 notes dans la sélection
+- 66 — Gone with the Wind — Margaret Mitchell
+  lecteur 1 : 4/5 (position 230515), lecteur 2 : 3/5 (position 2822521), écart 1, 3028 notes dans la sélection
+- 33 — Memoirs of a Geisha — Arthur Golden
+  lecteur 1 : 4/5 (position 230497), lecteur 2 : 4/5 (position 8), écart 0, 4413 notes dans la sélection
+- 10 — Pride and Prejudice — Jane Austen
+  lecteur 1 : 4/5 (position 230501), lecteur 2 : 5/5 (position 5695028), écart 1, 5220 notes dans la sélection
+
+Désaccords (1)
+- 54 — The Hitchhiker's Guide to the Galaxy (Hitchhiker's Guide to the Galaxy, #1) — Douglas Adams
+  lecteur 1 : 3/5 (position 999505), lecteur 2 : 5/5 (position 2822523), écart 2, 3899 notes dans la sélection

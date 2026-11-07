@@ -28,6 +28,9 @@ def main() -> None:
 
 
 class Handler(BaseHTTPRequestHandler):
+    # Chaque formulaire de la page est une adresse :
+    # /explore, /compare, /recommend, /trace, /interests.
+    # L'import est un POST, parce qu'il écrit dans la base.
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         params = parse_qs(parsed.query)

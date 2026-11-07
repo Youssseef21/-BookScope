@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-06",
+  "seed": 20261106,
+  "parameters": {
+    "top_n": 10,
+    "relevant": "note >= 4 dans les 5 dernières notes",
+    "k_truncated": 5
+  },
+  "readers_eligible": 19999,
+  "readers_evaluated": 1500,
+  "groups": {
+    "complete": {
+      "methods": {
+        "f3": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.098,
+          "recall_at_10": 0.04,
+          "precision_at_10": 0.0133,
+          "hit_rate_standard_error": 0.0077
+        },
+        "popularity": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.0487,
+          "recall_at_10": 0.0179,
+          "precision_at_10": 0.007,
+          "hit_rate_standard_error": 0.0056
+        },
+        "catalogue_popularity": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.0513,
+          "recall_at_10": 0.0154,
+          "precision_at_10": 0.0056,
+          "hit_rate_standard_error": 0.0057
+        }
+      },
+      "f3_modes": {
+        "short_history": 125,
+        "neighbors": 1375
+      },
+      "f3_share_in_top100_mean": 0.0321
+    },
+    "truncated": {
+      "methods": {
+        "f3": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.0307,
+          "recall_at_10": 0.0095,
+          "precision_at_10": 0.0034,
+          "hit_rate_standard_error": 0.0045
+        },
+        "popularity": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.0307,
+          "recall_at_10": 0.011,
+          "precision_at_10": 0.0041,
+          "hit_rate_standard_error": 0.0045
+        },
+        "catalogue_popularity": {
+          "readers": 1500,
+          "hit_rate_at_10": 0.032,
+          "recall_at_10": 0.0091,
+          "precision_at_10": 0.0032,
+          "hit_rate_standard_error": 0.0045
+        }
+      },
+      "f3_modes": {
+        "neighbors": 1403,
+        "short_history": 97
+      },
+      "f3_share_in_top100_mean": 0.1467
+    }
+  },
+  "held_out_positive_ratings": 72218,
+  "leakage": {
+    "note": "ratings_count et average_rating de books.csv, et les compteurs de tags, viennent du jeu Goodreads complet : ils incluent les notes retenues. F3 ne lit ni ratings_count ni average_rating ; il lit les compteurs de tags (seulement en repli) et les notes stockées.",
+    "positive_held_out_in_top100_of_stored_ratings": 0.089,
+    "positive_held_out_in_top100_of_catalogue_ratings_count": 0.089,
+    "held_out_pairs_on_reading_list_sample_3000_readers": 0,
+    "held_out_ratings_total": 102930,
+    "reading_list_rule": "les 279 paires retenues présentes dans to_read.csv ont été retirées avant le chargement",
+    "time_order_limit": "l'ordre du fichier est un ordre relatif par lecteur ; les notes des voisins ne sont pas datées par rapport aux notes retenues du lecteur évalué"
+  }
+}

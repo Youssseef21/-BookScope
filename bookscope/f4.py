@@ -44,9 +44,12 @@ def trace(db: Database, left: str | int, right: str | int) -> dict[str, Any]:
 
     positive_a = _positive(db, book_a["book_id"])
     positive_b = _positive(db, book_b["book_id"])
+    # L'activité sert à écarter les lecteurs qui ont au moins 150 notes :
+    # ils relient trop de livres pour qu'un chemin soit informatif.
     activity = _activity(db, set(positive_a) | set(positive_b))
     direct = _direct(positive_a, positive_b, activity)
     counts = _rating_counts(db)
+    # Les 100 livres les plus notés ne peuvent pas servir de pont.
     top100 = {
         book_id
         for book_id, _count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:TOP_POPULAR]
@@ -123,6 +126,8 @@ def _rating_counts(db: Database) -> dict[int, int]:
 
 def _direct(positive_a: dict[int, dict], positive_b: dict[int, dict], activity: dict[int, int]) -> dict:
     shared = sorted(set(positive_a) & set(positive_b))
+    # Le lien direct n'est convaincant que par les lecteurs ordinaires.
+    # Les très actifs sont comptés à part et exclus de la preuve.
     ordinary = [user_id for user_id in shared if activity.get(user_id, 0) < ACTIVITY_CAP]
     highly_active = [user_id for user_id in shared if activity.get(user_id, 0) >= ACTIVITY_CAP]
     evidence = []

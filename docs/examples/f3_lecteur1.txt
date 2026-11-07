@@ -1,0 +1,57 @@
+Lecteur 1 : 112 notes utilisées, dont 58 à 4 ou 5
+Mode : lecteurs qui ont aimé les mêmes livres, en privilégiant les moins populaires.
+Aucune des 10 propositions ne fait partie des 100 livres les plus notés. Popularité médiane des propositions : 75.0 notes. Popularité médiane de ces 100 livres : 3604.5 notes.
+
+1. 3722 — The Story of the Lost Child (The Neapolitan Novels, #4) — Elena Ferrante, Ann Goldstein
+   113 notes dans la sélection, hors du top 100.
+   7 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 4/5 (position 5753640), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 20127 : 5/5 (position 5849853), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 18476 : 4/5 (position 5719167), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+2. 4519 — Ancestors of Avalon (Avalon, #5) — Diana L. Paxson, Marion Zimmer Bradley
+   56 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 20127 : 4/5 (position 5491672), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 46032 : 4/5 (position 4087883), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « A Year in Provence » noté 4/5 (position 230486)
+3. 9054 — The Submission — Amy Waldman
+   67 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 5/5 (position 1481005), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 42097 : 4/5 (position 3571544), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+4. 7944 — May We Be Forgiven — A.M. Homes
+   63 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 4/5 (position 3231803), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 30691 : 4/5 (position 4375425), en commun sur « Born on a Blue Day: Inside the Extraordinary Mind of an Autistic Savant » noté 4/5 (position 4659195); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+5. 7673 — Nora Webster — Colm Tóibín
+   84 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 4/5 (position 4719764), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 18476 : 4/5 (position 5101251), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+6. 6329 — Please Look After Mom — Kyung-Sook Shin, 신경숙, Chi-Young Kim
+   78 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 5/5 (position 1446127), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 30257 : 5/5 (position 2268105), en commun sur « Born on a Blue Day: Inside the Extraordinary Mind of an Autistic Savant » noté 4/5 (position 4659195); « West with the Night » noté 4/5 (position 230484)
+7. 7390 — Elizabeth Street — Laurie Fabiano
+   72 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 20127 : 5/5 (position 5792829), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 25682 : 4/5 (position 2091924), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+8. 3427 — The Buddha in the Attic — Julie Otsuka
+   148 notes dans la sélection, hors du top 100.
+   3 lecteurs proches ont mis au moins 4/5.
+   lecteur 3357 : 4/5 (position 3042085), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 30257 : 4/5 (position 2268103), en commun sur « Born on a Blue Day: Inside the Extraordinary Mind of an Autistic Savant » noté 4/5 (position 4659195); « West with the Night » noté 4/5 (position 230484)
+   lecteur 42097 : 4/5 (position 3571543), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+9. 2664 — Sweet Tooth — Ian McEwan
+   197 notes dans la sélection, hors du top 100.
+   3 lecteurs proches ont mis au moins 4/5.
+   lecteur 1222 : 5/5 (position 2360292), en commun sur « The Cat's Table » noté 4/5 (position 2659245); « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160)
+   lecteur 3357 : 4/5 (position 3065722), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 9151 : 4/5 (position 3118848), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+10. 9215 — Fugitive Pieces — Anne Michaels
+   66 notes dans la sélection, hors du top 100.
+   2 lecteurs proches ont mis au moins 4/5.
+   lecteur 9151 : 4/5 (position 838613), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)
+   lecteur 42097 : 4/5 (position 3571539), en commun sur « Those Who Leave and Those Who Stay (The Neapolitan Novels #3) » noté 5/5 (position 4659160); « The Story of a New Name (The Neapolitan Novels #2) » noté 5/5 (position 4659159)

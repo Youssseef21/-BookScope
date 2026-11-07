@@ -1,0 +1,26 @@
+mystery et historical-fiction
+Le lien reste visible sans les 100 livres les plus notés ni les lecteurs qui ont au moins 150 notes.
+
+Lecteurs qui ont aimé un livre de chaque côté : 19685.
+Après avoir écarté les livres très notés et les lecteurs très actifs : 17576.
+
+Livres qui portent les deux tags, classés par le nombre de notes d'au moins 4/5
+- 4 — To Kill a Mockingbird — 6273 lecteurs à 4 ou 5, 7425 notes, dans le top 100
+- 9 — Angels & Demons  (Robert Langdon, #1) — 2998 lecteurs à 4 ou 5, 5225 notes, dans le top 100
+- 26 — The Da Vinci Code (Robert Langdon, #2) — 2962 lecteurs à 4 ou 5, 5050 notes, dans le top 100
+- 93 — The Secret Garden — 2225 lecteurs à 4 ou 5, 2953 notes, dans le top 100
+- 71 — Frankenstein — 1820 lecteurs à 4 ou 5, 3020 notes, dans le top 100
+
+Les mêmes livres, sans le top 100 ni les lecteurs très actifs
+- 103 — The Count of Monte Cristo — 1491 lecteurs à 4 ou 5, 2122 notes, hors du top 100
+- 142 — The Pillars of the Earth (The Kingsbridge Series, #1) — 1489 lecteurs à 4 ou 5, 2176 notes, hors du top 100
+- 205 — Interview with the Vampire (The Vampire Chronicles, #1) — 1344 lecteurs à 4 ou 5, 2279 notes, hors du top 100
+- 185 — The Night Circus — 1305 lecteurs à 4 ou 5, 2009 notes, hors du top 100
+- 177 — Crime and Punishment — 1199 lecteurs à 4 ou 5, 1769 notes, hors du top 100
+
+Exemples de lecteurs
+- lecteur 1 : 4/5 à « Mystic River » (position 999484), 5/5 à « Divine Secrets of the Ya-Ya Sisterhood » (position 230493)
+- lecteur 2 : 5/5 à « Do Androids Dream of Electric Sheep? » (position 2816990), 5/5 à « On the Road » (position 2730349)
+- lecteur 6 : 4/5 à « The Wind-Up Bird Chronicle » (position 1639434), 5/5 à « Love in the Time of Cholera » (position 3788999)
+- lecteur 11 : 4/5 à « Watchmen » (position 327430), 4/5 à « Middlesex » (position 182)
+- lecteur 12 : 4/5 à « A Clockwork Orange » (position 1822122), 5/5 à « The Joy Luck Club » (position 1822194)

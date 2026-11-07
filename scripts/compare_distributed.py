@@ -20,6 +20,7 @@ from bookscope.f1 import explore
 from bookscope.f2 import compare
 from bookscope.f3 import recommend
 from bookscope.f4 import trace
+from bookscope.f5 import link_interests
 from bookscope.f6 import import_file
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -49,6 +50,7 @@ def main() -> None:
     report["services"]["f1"] = check("F1", cluster, lambda db: explore(db, 258), single)
     report["services"]["f4"] = check("F4", cluster, lambda db: trace(db, 258, 1467), single)
     report["services"]["f3"] = check("F3", cluster, lambda db: recommend(db, 1), single)
+    report["services"]["f5"] = check("F5", cluster, lambda db: link_interests(db, "mystery", "historical-fiction"), single)
     if args.placement == "by_reader":
         imported = import_file(cluster, BATCH)
         report["f6"] = {
@@ -98,11 +100,15 @@ def show_incomplete(cluster: Cluster) -> None:
             refused[label] = {"complete": False, "missing": error.missing}
             continue
         raise RuntimeError(f"{label} a répondu {result.get('status')} alors qu'une instance manque")
+    # The catalogue is copied on both instances, so a catalogue-only lookup still answers.
+    book = cluster.books.find_one({"book_id": 258}, {"_id": 0, "book_id": 1, "title": 1})
+    print(f"fiche du livre 258 (catalogue copié) : {book}", flush=True)
+    refused["catalogue_lookup_book_258"] = {"complete": True, "answer": book, "why": "livres copiés sur les deux instances"}
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     previous = {}
     if OUTPUT.exists():
         previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
-    previous["by_book_instance_b_stopped"] = refused
+    previous[f"{cluster.placement}_one_instance_stopped"] = refused
     OUTPUT.write_text(json.dumps(previous, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 

@@ -72,7 +72,7 @@ def main() -> None:
         item["requests"] = {"user_a": user_a, "user_b": user_b, "book_id": book_id}
 
     result = {
-        "date": "2026-10-30",
+        "date": time.strftime("%Y-%m-%d"),
         "prediction_file": "data/measurements/e2_prediction.txt",
         "hardware": {
             "platform": platform.platform(),

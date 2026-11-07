@@ -23,9 +23,13 @@ from pymongo.database import Database
 
 from bookscope.tags import COMMON_TAG_FRACTION, is_extremely_common, is_status
 
+# Une note de 1, 2 ou 3 ne crée pas de lien entre deux livres.
 MIN_RATING = 4
+# En dessous de 5 lecteurs en commun, le hasard suffit à expliquer le lien.
 MIN_SHARED_READERS = 5
+# Un tag posé moins de 50 fois sur un livre est trop faible pour décrire son contenu.
 MIN_TAG_COUNT = 50
+# La page montre 5 liens par les lecteurs, 5 par le thème, et 10 preuves par lien.
 READER_LINKS = 5
 THEME_LINKS = 5
 EVIDENCE_LIMIT = 10
@@ -33,6 +37,8 @@ EVIDENCE_LIMIT = 10
 
 def explore(db: Database, query: str | int) -> dict[str, Any]:
     """Explore a book. `query` is a book_id or a title."""
+    # Étape 1. Retrouver le livre. Un numéro va directement au book_id.
+    # Un titre peut correspondre à plusieurs livres : on n'en choisit aucun.
     matches = resolve_books(db, query)
     if not matches:
         return {"status": "not_found", "query": query}
@@ -44,12 +50,20 @@ def explore(db: Database, query: str | int) -> dict[str, Any]:
         }
 
     book = matches[0]
+    # Étape 2. Compter, pour chaque tag, sur combien de livres du catalogue il est.
+    # Cela sert à écarter « fiction », présent sur presque tous les livres.
     catalogue_size, tag_df = _tag_frequencies(db)
+    # Étape 3. Séparer les tags du livre : contenu utile, ou tag ignoré.
     described = _describe_book(book, tag_df, catalogue_size)
+    # Étape 4. Garder les lecteurs qui ont mis 4 ou 5 à CE livre.
     seed_ratings = _positive_ratings(db, book["book_id"])
+    # Étape 5. Autres livres que ces mêmes lecteurs ont aussi notés 4 ou 5.
     reader_links = _reader_links(db, book, seed_ratings, tag_df, catalogue_size)
+    # Étape 6. Livres proches par les tags, sans répéter ceux déjà trouvés par les lecteurs.
     already = {item["book_id"] for item in reader_links}
     theme_links = _theme_links(db, book, described["content_tags"], tag_df, catalogue_size, already)
+    # Étape 7. Un exemple de lien qui ne compte pas : seulement un tag de statut
+    # ou un tag trop général, et pas assez de lecteurs en commun.
     weak_link = _common_tag_only(
         db, book, described["ignored_tags"], described["content_tags"], seed_ratings
     )
@@ -81,14 +95,17 @@ def explore(db: Database, query: str | int) -> dict[str, Any]:
 
 
 def resolve_books(db: Database, query: str | int) -> list[dict]:
+    # « 2 » ou 2 est le numéro du livre, pas un titre.
     if isinstance(query, int) or (isinstance(query, str) and query.strip().isdigit()):
         book = db.books.find_one({"book_id": int(query)})
         return [] if book is None else [book]
 
     title = str(query).strip()
+    # D'abord le titre exact, sans tenir compte des majuscules.
     exact = _find_titles(db, title, exact=True)
     if exact:
         return exact
+    # Un fragment trop court (« a », « ab ») matcherait des centaines de titres.
     if len(title) < 3:
         return []
     return _find_titles(db, title, exact=False)
@@ -128,6 +145,7 @@ def _tag_frequencies(db: Database) -> tuple[int, dict[str, int]]:
 
 
 def _describe_book(book: dict, tag_df: dict[str, int], catalogue_size: int) -> dict:
+    # Chaque tag du livre va dans une des deux listes affichées sur la page.
     content: list[dict] = []
     ignored: list[dict] = []
     for tag in book.get("tags", []):
@@ -137,11 +155,15 @@ def _describe_book(book: dict, tag_df: dict[str, int], catalogue_size: int) -> d
             "count": tag["count"],
             "books_with_tag": tag_df.get(tag["name"], 0),
         }
+        # « to-read » décrit l'étagère du lecteur. « fiction » est sur plus
+        # de la moitié du catalogue. Ni l'un ni l'autre ne prouve une ressemblance.
         common = is_extremely_common(tag["name"], item["books_with_tag"], catalogue_size)
         if common or is_status(tag["name"]):
             item["reason"] = "status" if is_status(tag["name"]) else "extremely_common"
             ignored.append(item)
         elif tag["count"] >= MIN_TAG_COUNT:
+            # Le nombre « 47478 » affiché est ce count : combien de fois
+            # le tag a été posé sur CE livre dans Goodbooks, pas un nombre de lecteurs.
             content.append(item)
     content.sort(key=lambda item: (-item["count"], item["name"]))
     ignored.sort(key=lambda item: (-item["count"], item["name"]))
@@ -149,6 +171,8 @@ def _describe_book(book: dict, tag_df: dict[str, int], catalogue_size: int) -> d
 
 
 def _positive_ratings(db: Database, book_id: int) -> dict[int, dict]:
+    # Dictionnaire lecteur -> sa note et sa position dans ratings.csv.
+    # Pour Harry Potter tome 1, cela fait les 7059 notes d'au moins 4/5.
     cursor = db.ratings.find(
         {"book_id": book_id, "rating": {"$gte": MIN_RATING}},
         {"_id": 0, "user_id": 1, "rating": 1, "source_row": 1},
@@ -196,13 +220,18 @@ def _reader_links(
     if not candidates:
         return []
 
+    # Popularité = nombre de notes >= 4, pas le nombre de lecteurs en commun.
     popularity = _positive_counts(db, [book["book_id"], *[row["_id"] for row in candidates]])
     n_seed = popularity.get(book["book_id"], len(seed_ratings))
     ranked = []
     for row in candidates:
         n_other = popularity.get(row["_id"], row["shared"])
+        # Force = communs / racine(popularité du livre × popularité de l'autre).
+        # Deux livres très célèbres ont une racine grande, donc une force plus basse
+        # s'ils ne sont pas vraiment lus par les mêmes personnes.
         strength = row["shared"] / math.sqrt(n_seed * n_other) if n_seed and n_other else 0.0
         ranked.append((strength, row["shared"], row["_id"], row["readers"]))
+    # À force égale, on préfère plus de lecteurs en commun, puis le plus petit book_id.
     ranked.sort(key=lambda item: (-item[0], -item[1], item[2]))
     chosen = ranked[:READER_LINKS]
 
@@ -300,6 +329,8 @@ def _theme_links(
         shared = _shared_content_tags(book, other, tag_df, catalogue_size)
         if not shared:
             continue
+        # On classe d'abord par le nombre de tags précis en commun,
+        # puis par le plus petit des deux comptes de tags (le côté le plus faible).
         score = len(shared)
         support = sum(min(tag["count_on_book"], tag["count_on_related"]) for tag in shared)
         ranked.append((score, support, other["book_id"], other, shared))
@@ -331,6 +362,8 @@ def _common_tag_only(
 ) -> dict | None:
     if not ignored_tags:
         return None
+    # On prend le tag ignoré le plus fort du livre de départ (souvent to-read)
+    # et on cherche un livre peu noté qui ne partage QUE ce tag.
     common = ignored_tags[0]
     specific_names = [tag["name"] for tag in content_tags]
     cursor = (

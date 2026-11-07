@@ -80,6 +80,21 @@
             "documents": 10802
           }
         }
+      },
+      "f5": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 3,
+            "documents": 388348
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 3,
+            "documents": 389511
+          }
+        }
       }
     },
     "f6": {
@@ -169,6 +184,21 @@
             "documents": 6225
           }
         }
+      },
+      "f5": {
+        "equal_to_single_server": true,
+        "exchanged": {
+          "A": {
+            "endpoint": "localhost:27018",
+            "calls": 3,
+            "documents": 387974
+          },
+          "B": {
+            "endpoint": "localhost:27019",
+            "calls": 3,
+            "documents": 400452
+          }
+        }
       }
     }
   },
@@ -184,6 +214,50 @@
       "missing": [
         "B (localhost:27019)"
       ]
+    }
+  },
+  "by_book_one_instance_stopped": {
+    "F2": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    },
+    "F3": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    },
+    "catalogue_lookup_book_258": {
+      "complete": true,
+      "answer": {
+        "book_id": 258,
+        "title": "The Shadow of the Wind (The Cemetery of Forgotten Books,  #1)"
+      },
+      "why": "livres copiés sur les deux instances"
+    }
+  },
+  "by_reader_one_instance_stopped": {
+    "F2": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    },
+    "F3": {
+      "complete": false,
+      "missing": [
+        "B (localhost:27019)"
+      ]
+    },
+    "catalogue_lookup_book_258": {
+      "complete": true,
+      "answer": {
+        "book_id": 258,
+        "title": "The Shadow of the Wind (The Cemetery of Forgotten Books,  #1)"
+      },
+      "why": "livres copiés sur les deux instances"
     }
   }
 }

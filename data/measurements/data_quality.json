@@ -1,0 +1,263 @@
+{
+  "selection": {
+    "readers": 20586,
+    "books_rated": 10000,
+    "ratings": 2336014,
+    "to_read_entries": 357666,
+    "tags_in_tags_csv": 34252,
+    "book_tag_rows_on_selected_books": 999912,
+    "mystery_books": 2393,
+    "ratings_per_reader": {
+      "min": 27,
+      "p25": 97,
+      "p50": 112,
+      "p75": 129,
+      "p90": 146,
+      "p99": 176,
+      "max": 199,
+      "mean": 113.48
+    },
+    "ratings_per_book": {
+      "min": 2,
+      "p25": 59,
+      "p50": 96,
+      "p75": 198,
+      "p90": 464,
+      "p99": 2475,
+      "max": 9144,
+      "mean": 233.6
+    }
+  },
+  "issues": [
+    {
+      "issue": "Livre sans ISBN",
+      "count": 700,
+      "out_of": 10000,
+      "examples": [
+        106,
+        121,
+        162,
+        188,
+        203
+      ],
+      "effect": "books.csv, colonne isbn vide. Un livre ne peut pas être relié à une édition précise."
+    },
+    {
+      "issue": "Livre sans année de publication",
+      "count": 21,
+      "out_of": 10000,
+      "examples": [
+        220,
+        976,
+        3506,
+        4229,
+        4248
+      ],
+      "effect": "books.csv, colonne original_publication_year vide."
+    },
+    {
+      "issue": "Livre sans titre original",
+      "count": 590,
+      "out_of": 10000,
+      "examples": [
+        75,
+        143,
+        210,
+        215,
+        257
+      ],
+      "effect": "books.csv, colonne original_title vide : la recherche par titre ne trouve que le titre de l'édition."
+    },
+    {
+      "issue": "Titre porté par plusieurs livres",
+      "count": 33,
+      "out_of": 9964,
+      "examples": [
+        {
+          "title": "selected poems",
+          "book_ids": [
+            6455,
+            8221,
+            8899,
+            9784
+          ]
+        },
+        {
+          "title": "stone soup",
+          "book_ids": [
+            3051,
+            4375,
+            8969
+          ]
+        },
+        {
+          "title": "'salem's lot",
+          "book_ids": [
+            349,
+            1292
+          ]
+        }
+      ],
+      "effect": "Un titre n'identifie pas un livre : F1 et F4 affichent l'ambiguïté au lieu de choisir."
+    },
+    {
+      "issue": "Tags qui décrivent un statut de lecture et non le contenu",
+      "count": 163218637,
+      "out_of": 208851252,
+      "examples": [
+        {
+          "tag": "to-read",
+          "uses": 140718761
+        },
+        {
+          "tag": "currently-reading",
+          "uses": 7507958
+        },
+        {
+          "tag": "favorites",
+          "uses": 4503173
+        },
+        {
+          "tag": "books-i-own",
+          "uses": 1317235
+        },
+        {
+          "tag": "owned",
+          "uses": 1224279
+        }
+      ],
+      "effect": "Part des usages de tags qui sont des étagères personnelles (to-read, favorites). F1, F4 et F5 les écartent."
+    },
+    {
+      "issue": "Compteur de tag négatif",
+      "count": 6,
+      "out_of": null,
+      "examples": [
+        {
+          "goodreads_book_id": 18607805,
+          "tag_id": 10197,
+          "count": -1
+        },
+        {
+          "goodreads_book_id": 18607805,
+          "tag_id": 21619,
+          "count": -1
+        },
+        {
+          "goodreads_book_id": 18607805,
+          "tag_id": 17246,
+          "count": -1
+        },
+        {
+          "goodreads_book_id": 18607805,
+          "tag_id": 6552,
+          "count": -1
+        },
+        {
+          "goodreads_book_id": 18607805,
+          "tag_id": 2272,
+          "count": -1
+        }
+      ],
+      "effect": "book_tags.csv : un count négatif n'a pas de sens ; un seuil count >= 50 l'élimine."
+    },
+    {
+      "issue": "Livre à la fois dans la liste à lire et noté par le même lecteur",
+      "count": 874,
+      "out_of": 357666,
+      "examples": [
+        {
+          "user_id": 662,
+          "book_id": 45
+        },
+        {
+          "user_id": 841,
+          "book_id": 3508
+        },
+        {
+          "user_id": 1111,
+          "book_id": 493
+        },
+        {
+          "user_id": 1561,
+          "book_id": 1986
+        },
+        {
+          "user_id": 1147,
+          "book_id": 57
+        }
+      ],
+      "effect": "to_read.csv recoupe ratings.csv : la liste à lire ne dit pas ce que le lecteur n'a pas lu."
+    },
+    {
+      "issue": "Année de publication hors de 1000-2017",
+      "count": 38,
+      "out_of": 9979,
+      "examples": [
+        {
+          "book_id": 79,
+          "year": -720,
+          "title": "The Odyssey"
+        },
+        {
+          "book_id": 341,
+          "year": -750,
+          "title": "The Iliad"
+        },
+        {
+          "book_id": 403,
+          "year": -500,
+          "title": "The Art of War"
+        },
+        {
+          "book_id": 531,
+          "year": 975,
+          "title": "Beowulf"
+        },
+        {
+          "book_id": 772,
+          "year": -380,
+          "title": "The Republic"
+        }
+      ],
+      "effect": "Années négatives pour les textes anciens : un calcul d'âge d'un livre serait faux."
+    },
+    {
+      "issue": "Livre sans code de langue",
+      "count": 1084,
+      "out_of": 10000,
+      "examples": [
+        45,
+        132,
+        204,
+        237,
+        288
+      ],
+      "effect": "books.csv, colonne language_code vide."
+    },
+    {
+      "issue": "Même couple (lecteur, livre) noté deux fois dans la sélection",
+      "count": 0,
+      "out_of": 2336014,
+      "examples": [],
+      "effect": "Attendu : 0. La politique F6 est implémentée mais n'a pas de conflit réel à traiter."
+    },
+    {
+      "issue": "Même couple (lecteur, livre) deux fois dans la liste à lire",
+      "count": 0,
+      "out_of": 357666,
+      "examples": [],
+      "effect": "Attendu : 0."
+    },
+    {
+      "issue": "book_tags.csv : livre introuvable ou tag inconnu",
+      "count": 0,
+      "out_of": null,
+      "examples": {
+        "unresolved_goodreads_book_id": [],
+        "unknown_tag_id": []
+      },
+      "effect": "Références qui ne peuvent pas être résolues. Attendu : 0."
+    }
+  ]
+}

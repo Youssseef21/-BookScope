@@ -1,0 +1,81 @@
+{
+  "stored_ratings_rebuilt": 2233084,
+  "f2": {
+    "readers": [
+      1,
+      2
+    ],
+    "ratings_used": [
+      112,
+      60
+    ],
+    "shared_books": 6,
+    "overlap_with_shorter_history": 0.1,
+    "popularity_weighted_agreement": 0.8298,
+    "strength": 0.083,
+    "similar": 5,
+    "disagree": 1
+  },
+  "f4": {
+    "books": [
+      258,
+      1467
+    ],
+    "readers_who_liked_both": 126,
+    "ordinary_readers": 121,
+    "highly_active_readers": 5,
+    "convincing_direct": true
+  },
+  "f5": {
+    "tags": [
+      "mystery",
+      "historical-fiction"
+    ],
+    "books_with_tag_a": 2074,
+    "books_with_tag_b": 1476,
+    "bridge_books_total": 290,
+    "readers_full": 19685
+  },
+  "service_comparison": {
+    "f2.shared_books": {
+      "csv_script": 6,
+      "service": 6,
+      "equal": true
+    },
+    "f2.overlap": {
+      "csv_script": 0.1,
+      "service": 0.1,
+      "equal": true
+    },
+    "f2.agreement": {
+      "csv_script": 0.8298,
+      "service": 0.8298,
+      "equal": true
+    },
+    "f2.strength": {
+      "csv_script": 0.083,
+      "service": 0.083,
+      "equal": true
+    },
+    "f4.ordinary_readers": {
+      "csv_script": 121,
+      "service": 121,
+      "equal": true
+    },
+    "f4.highly_active_readers": {
+      "csv_script": 5,
+      "service": 5,
+      "equal": true
+    },
+    "f5.bridge_books_total": {
+      "csv_script": 290,
+      "service": 290,
+      "equal": true
+    },
+    "f5.readers_full": {
+      "csv_script": 19685,
+      "service": 19685,
+      "equal": true
+    }
+  }
+}

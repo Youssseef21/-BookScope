@@ -99,9 +99,12 @@ def _apply(db: Database, parsed: list[dict], rejected: list[dict]) -> dict[str, 
         stored = existing.get(key)
         if stored is not None:
             kept = stored
+            # Même note : on ne réécrit rien. Relancer le fichier est donc sans effet.
             if stored["rating"] == row["rating"]:
                 already_present += 1
             else:
+                # Note différente : on garde l'ancienne pour F1–F5,
+                # et on enregistre la nouvelle à part pour ne pas la perdre.
                 conflicts.append(_conflict(stored, row))
         elif row["user_id"] not in known_users:
             _reject_pair(rejected, row, extras.get(key, []), "lecteur hors sélection")

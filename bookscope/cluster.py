@@ -23,7 +23,12 @@ PLACEMENTS = ("by_reader", "by_book")
 
 
 class Incomplete(RuntimeError):
-    """A needed instance did not answer. The result must not be completed from the other one."""
+    """Une instance nécessaire n'a pas répondu.
+
+    On lève cette erreur avant de renvoyer quoi que ce soit.
+    Une réponse calculée seulement avec l'autre instance serait incomplète,
+    et elle ne doit pas être présentée comme un résultat.
+    """
 
     def __init__(self, missing: list[str]):
         self.missing = missing
@@ -49,11 +54,13 @@ class Instance:
 
 
 class Cluster:
-    def __init__(self, placement: str):
+    def __init__(self, placement: str, suffix: str = ""):
+        # suffix selects another copy of the data on the same two instances,
+        # for example "_full" for the E2 experiment on every rating.
         if placement not in PLACEMENTS:
             raise ValueError(placement)
         self.placement = placement
-        database = "dist_reader" if placement == "by_reader" else "dist_book"
+        database = ("dist_reader" if placement == "by_reader" else "dist_book") + suffix
         self.instances = {
             "A": Instance("A", "localhost:27018", INSTANCE_A, database),
             "B": Instance("B", "localhost:27019", INSTANCE_B, database),
@@ -84,6 +91,9 @@ class Cluster:
         return totals
 
     def home(self, user_id: int, book_id: int) -> str:
+        # Par lecteur : toutes les notes d'une personne sont sur une seule instance.
+        # Par livre : toutes les notes d'un livre sont sur une seule instance.
+        # Pair -> A (port 27018), impair -> B (port 27019).
         if self.placement == "by_reader":
             return "A" if user_id % 2 == 0 else "B"
         return "A" if book_id % 2 == 0 else "B"

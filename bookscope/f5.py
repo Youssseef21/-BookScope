@@ -43,7 +43,10 @@ def link_interests(db: Database, left: str, right: str) -> dict[str, Any]:
 
     books_a = _books_for(db, interest_a["name"])
     books_b = _books_for(db, interest_b["name"])
+    # Pont : le livre porte les deux tags, chacun au moins 50 fois.
     bridge_ids = set(books_a) & set(books_b)
+    # Côté exclusif : le tag A sans le tag B, et l'inverse.
+    # Un lecteur « relie » les thèmes s'il a aimé un livre de chaque côté exclusif.
     exclusive_a = set(books_a) - bridge_ids
     exclusive_b = set(books_b) - bridge_ids
     counts = _rating_counts(db)
@@ -140,7 +143,10 @@ def _positive_pairs(db: Database, book_ids: set[int]) -> list[tuple[int, int]]:
         {"book_id": {"$in": list(book_ids)}, "rating": {"$gte": MIN_RATING}},
         {"_id": 0, "user_id": 1, "book_id": 1, "rating": 1, "source_row": 1},
     )
-    return [(row["user_id"], row["book_id"], row) for row in cursor]
+    # Documents arrive in a different order on one server and on two instances.
+    # A canonical order keeps the examples identical in every deployment.
+    rows = sorted(cursor, key=lambda row: (row["user_id"], row["book_id"]))
+    return [(row["user_id"], row["book_id"], row) for row in rows]
 
 
 def _activity(db: Database, user_ids: set[int]) -> dict[int, int]:
@@ -268,8 +274,10 @@ def _side(row: dict, info: dict[int, dict]) -> dict:
 
 
 def _persistence(full_readers: int, discounted_readers: int, discounted_bridges: int) -> str:
+    # « persists » : le lien reste après avoir enlevé le top 100 et les lecteurs très actifs.
     if discounted_readers >= 20 or discounted_bridges >= 3:
         return "persists"
+    # « disappears » : il avait l'air fort, et il ne reste presque rien.
     if full_readers >= 20 and discounted_readers < 5 and discounted_bridges == 0:
         return "disappears"
     if full_readers > 0 or discounted_readers > 0 or discounted_bridges > 0:

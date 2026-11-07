@@ -24,6 +24,8 @@ from bookscope.tags import is_extremely_common, is_status
 
 MIN_RATINGS_FOR_NEIGHBORS = 5
 MIN_RATING = 4
+# On cherche des voisins à partir des livres les moins populaires aimés par le lecteur,
+# pas à partir de Harry Potter : sinon les propositions recopient le classement général.
 SEED_BOOKS = 12
 NEIGHBOR_LIMIT = 40
 RECOMMENDATIONS = 10
@@ -43,11 +45,13 @@ def recommend(db: Database, user_id: int, first: int | None = None) -> dict[str,
     counts = _rating_counts(db)
     top100 = _top_book_ids(counts)
     liked = [row for row in history if row["rating"] >= MIN_RATING]
+    # S'il n'a aucune note >= 4, on se rabat sur toutes ses notes pour les tags.
     taste = liked or history
     already = {row["book_id"] for row in history}
 
     mode = "neighbors"
     fallback = None
+    # Moins de 5 notes : on ne cherche pas de voisins, seulement les tags.
     if profile["ratings_used"] < MIN_RATINGS_FOR_NEIGHBORS:
         mode = "short_history"
         recommendations = _from_tags(db, taste, already, counts)
@@ -58,6 +62,7 @@ def recommend(db: Database, user_id: int, first: int | None = None) -> dict[str,
             fallback = "no_neighbor"
             recommendations = _from_tags(db, taste, already, counts)
 
+    # La liste « à lire » est une étiquette, pas le signal qui classe les livres.
     reading_list = {
         row["book_id"]
         for row in db.to_read.find({"user_id": user_id}, {"_id": 0, "book_id": 1})
@@ -173,6 +178,7 @@ def _from_neighbors(
     }
     neighbors = {}
     for row in grouped:
+        # Un voisin qui a noté beaucoup de livres pèse moins.
         weight = row["shared"] / math.sqrt(activity.get(row["_id"], row["shared"]))
         neighbors[row["_id"]] = {
             "weight": weight,
@@ -210,6 +216,7 @@ def _from_neighbors(
             continue
         support = sum(neighbors[reader["user_id"]]["weight"] for reader in supporters)
         popularity = counts.get(row["_id"], 1)
+        # Le score baisse quand le livre proposé est déjà très noté.
         score = support / math.sqrt(popularity)
         ranked.append((score, row["_id"], supporters, popularity))
     ranked.sort(key=lambda item: (-item[0], item[1]))

@@ -20,6 +20,8 @@ from typing import Any
 from pymongo.database import Database
 
 MIN_SHARED_BOOKS = 5
+# Écart de 0 ou 1 étoile : les deux lecteurs sont d'accord.
+# Écart de 2, 3 ou 4 : ils ne sont pas d'accord.
 SIMILAR_MAX_DIFF = 1
 DISAGREE_MIN_DIFF = 2
 DISPLAY_LIMIT = 8
@@ -35,6 +37,8 @@ def compare(
     if user_a == user_b:
         return {"status": "same_reader", "user_id": user_a}
 
+    # `first` sert au jury : « les 5 premières notes du lecteur 1 ».
+    # Ce n'est pas un nouveau lecteur, l'historique est seulement coupé.
     limits = first or {}
     profile_a, ratings_a = _profile(db, user_a, limits.get(user_a))
     profile_b, ratings_b = _profile(db, user_b, limits.get(user_b))
@@ -42,19 +46,26 @@ def compare(
     if missing:
         return {"status": "not_found", "user_ids": missing}
 
+    # Livres notés par les deux, dans l'ordre du book_id.
     shared_ids = sorted(set(ratings_a) & set(ratings_b))
     books = _books(db, shared_ids)
+    # Popularité = nombre de notes du livre dans la sélection, toutes notes confondues.
     popularity = _popularity(db, shared_ids)
     rows = [_shared_row(book_id, ratings_a, ratings_b, books, popularity) for book_id in shared_ids]
 
     similar = [row for row in rows if row["difference"] <= SIMILAR_MAX_DIFF]
     disagree = [row for row in rows if row["difference"] >= DISAGREE_MIN_DIFF]
+    # Les accords rares d'abord (poids fort), les désaccords les plus grands d'abord.
     similar.sort(key=lambda row: (-row["weight"], row["book_id"]))
     disagree.sort(key=lambda row: (-row["difference"], -row["weight"], row["book_id"]))
 
+    # Le recouvrement divise par le plus court des deux historiques,
+    # pour ne pas punir quelqu'un qui a noté peu de livres.
     shorter = min(profile_a["ratings_used"], profile_b["ratings_used"])
     overlap = len(rows) / shorter if shorter else 0.0
     weighted = _weighted_agreement(rows)
+    # Moins de 5 livres en commun : on affiche quand même les livres,
+    # mais on dit que la comparaison n'est pas significative.
     meaningful = len(rows) >= MIN_SHARED_BOOKS
 
     return {
@@ -83,6 +94,7 @@ def _profile(db: Database, user_id: int, first: int | None) -> tuple[dict, dict[
         {"user_id": user_id},
         {"_id": 0, "book_id": 1, "rating": 1, "source_row": 1},
     )
+    # L'ordre du fichier est le temps. Les « premières notes » sont les plus anciennes.
     history = sorted(cursor, key=lambda row: row["source_row"])
     used = history if first is None else history[:first]
     profile = {
@@ -138,6 +150,7 @@ def _shared_row(
         "source_row_b": right["source_row"],
         "difference": abs(left["rating"] - right["rating"]),
         "ratings_in_selection": readers,
+        # Un livre noté par tout le monde pèse moins : poids = 1 / racine(popularité).
         "weight": round(1 / math.sqrt(readers), 4),
     }
 
@@ -145,6 +158,8 @@ def _shared_row(
 def _weighted_agreement(rows: list[dict]) -> float:
     if not rows:
         return 0.0
+    # 1 - écart/4 vaut 1 si les notes sont identiques, et 0 si l'écart est de 4.
+    # Chaque livre est multiplié par son poids, donc un livre rare compte plus.
     total_weight = sum(row["weight"] for row in rows)
     agreed = sum((1 - row["difference"] / 4) * row["weight"] for row in rows)
     return agreed / total_weight

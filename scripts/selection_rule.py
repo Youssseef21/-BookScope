@@ -28,6 +28,8 @@ MYSTERY_TAGS = frozenset(
 
 MIN_TAG_COUNT = 50
 MIN_MYSTERY_RATINGS = 8
+# user_id % 5 n'est pas une qualité du lecteur. C'est un tirage fixe :
+# les restes 1 et 2 gardent environ 2 lecteurs sur 5, toujours les mêmes.
 USER_MOD = 5
 USER_REMAINDERS = frozenset({1, 2})
 
