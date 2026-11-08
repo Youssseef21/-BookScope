@@ -72,26 +72,57 @@ F6 : une note est identifiée par le couple (lecteur, livre). Si le couple exist
 
 `scripts\measure_model.py` compare une note par document (choix retenu) et un document par lecteur. Historique du lecteur 1 : 1,45 ms contre 0,59 ms. Notes d'au moins 4/5 du livre 258 : 5,5 ms contre 56 ms. Détail : `data/measurements/model_tradeoff.json`.
 
-## Deux instances
+## Base principale et partie distribuée
 
-Deux processus MongoDB sur cet ordinateur (pas un cluster de machines) : A sur le port 27018, B sur 27019. Les livres sont copiés des deux côtés, chaque note n'est que d'un côté.
+La base principale est `bookscope_app`, sur le port 27017. Elle contient les 2 233 084 notes. La page http://127.0.0.1:8000 l'interroge (`scripts\serve.py`).
+
+La partie distribuée est un cluster fragmenté décrit dans `compose.sharded.yml`. L'application ne parle qu'à une adresse, mongos sur le port 27200. mongos lit le serveur de configuration (port 27100), envoie la requête au fragment qui possède les notes, puis réunit les réponses. Deux fragments, chacun avec son disque :
+
+- shard1, port 27101, environ la moitié des notes, plus le catalogue ;
+- shard2, port 27102, le reste des notes.
+
+Deux bases utilisent ces fragments. `dist_reader` range toutes les notes d'un lecteur sur un seul fragment, par un hash du numéro de lecteur. `dist_book` range toutes les notes d'un livre sur un seul fragment, par un hash du numéro du livre. Les 10 000 livres et les 357 387 entrées « à lire » restent sur shard1. Ce montage tourne sur un seul ordinateur : ce n'est pas un groupe de machines.
+
+Sur les 2 233 084 notes, le hash donne :
+
+- par lecteur : 1 096 986 sur shard1, 1 136 098 sur shard2. Les lecteurs 1 (112 notes) et 2 (60 notes) sont entiers sur shard1. Le livre 258 est coupé, 664 et 652 ;
+- par livre : 1 172 371 sur shard1, 1 060 713 sur shard2. Le livre 258 (1 316 notes) est entier sur shard2, le livre 1467 (291 notes) est entier sur shard1. Le lecteur 1 est coupé, 59 et 53, le lecteur 2 aussi, 32 et 28.
 
 ```text
-.venv\Scripts\python.exe scripts\load_distributed.py
+.venv\Scripts\python.exe scripts\start_sharded.py
+.venv\Scripts\python.exe scripts\load_sharded.py
+.venv\Scripts\python.exe scripts\serve_distributed.py
+```
+
+La page http://127.0.0.1:8001 a les mêmes formulaires. **Par lecteur** ouvre `dist_reader`, **Par livre** ouvre `dist_book`.
+
+La comparaison avec la base principale est automatique :
+
+```text
 .venv\Scripts\python.exe scripts\compare_distributed.py by_reader
 .venv\Scripts\python.exe scripts\compare_distributed.py by_book
 ```
 
-- `by_reader` : `user_id` pair sur A, impair sur B. `by_book` : même règle avec `book_id`.
-- F1 à F5 donnent le même résultat que sur le serveur unique. Un second import F6 ajoute 0 note.
-- Si B est arrêtée (`docker stop bookscope-b`, puis `compare_distributed.py by_book --down`), F2 et F3 répondent « instance indisponible » au lieu d'une réponse partielle. `docker start bookscope-b` la relance.
+Pour un fragment arrêté, avec le placement par livre (les notes d'un lecteur sont alors sur les deux fragments) :
+
+```text
+docker stop bookscope-shard2
+.venv\Scripts\python.exe scripts\compare_distributed.py by_book --down
+docker start bookscope-shard2
+```
+
+F2 puis F3 répondent « instance indisponible » et ne donnent pas de score. La page affiche « Réponse refusée : elle serait incomplète. » Le titre du livre 258 s'affiche encore, parce que le catalogue est sur shard1. En placement par livre, les 1 316 notes de ce livre sont sur shard2, donc l'exploration complète est refusée. Une copie de production pourrait relire les mêmes notes sur un second disque du fragment. Ici, les notes de shard2 n'existent pas ailleurs.
+
+Les scores F1 à F5 sont les mêmes que sur la base principale. Le hash change l'endroit des notes, pas le résultat.
+
+`scripts\compare_random_half.py` est un contrôle à part, sur le serveur principal. Il recopie environ la moitié des notes dans `bookscope_half` et laisse `bookscope_app` intacte.
 
 ## Expériences
 
 | | Script | Résultat |
 |---|---|---|
 | E1 | `measure_e1.py` | trois tailles, tableau ci-dessous |
-| E2 | `prepare_e2_data.py`, puis `measure_e2.py --size 4 --repeats 3` (environ 40 min) | serveur unique et deux répartitions au même niveau : de 11 à 44 s pour 4 requêtes ; la prédiction `e2_prediction.txt` n'est pas confirmée |
+| E2 | `measure_e2.py --size 4 --repeats 3` (environ 12 min) | sur les 2 233 084 notes : serveur unique 2,1 s / 8,8 s / 23,3 s ; par lecteur 5,9 / 12,4 / 28,2 ; par livre 9,7 / 18,4 / 28,7. Réponses identiques. La prédiction `e2_prediction.txt` est confirmée pour les questions lecteur, pas pour les questions livre |
 | E3 | `evaluate_e3.py --readers 1500 --k 5` | succès@10 de F3 : 9,8 % (historique complet) contre 4,9 % (popularité) ; 3,1 % contre 3,1 % avec 5 notes |
 | Vérification | `verify_independent.py --compare` | F2, F4, F5 recalculés depuis les CSV : 8 valeurs identiques |
 | Qualité | `data_quality.py` | dix problèmes avec effectifs et identifiants |
@@ -106,7 +137,8 @@ Toutes les mesures sont dans `data/measurements/` (`e1.json`, `e2.json`, `e3.jso
 
 ## Fichiers
 
-- `bookscope/` : `f1.py` à `f6.py` (services), `cluster.py` (accès aux deux instances), `tags.py`, `db.py`, `web.py` (interface).
-- `scripts/` : commandes des services, chargement (`load_raw.py`, `prepare_selection.py`, `selection_rule.py`), partie distribuée (`load_distributed.py`, `compare_distributed.py`), expériences (`measure_*.py`, `evaluate_e3.py`, `prepare_e2_data.py`), contrôles (`verify_independent.py`, `data_quality.py`), `serve.py`.
+- `bookscope/` : `f1.py` à `f6.py` (services), `sharded.py` (mongos), `tags.py`, `db.py`, `web.py` (interface).
+- `scripts/` : commandes des services, chargement (`load_raw.py`, `prepare_selection.py`, `selection_rule.py`), cluster (`start_sharded.py`, `load_sharded.py`, `compare_distributed.py`, `serve_distributed.py`), expériences (`measure_e1.py`, `measure_e2.py`, `evaluate_e3.py`), contrôles (`verify_independent.py`, `data_quality.py`, `compare_random_half.py`), `serve.py`.
+- `compose.sharded.yml` : mongos, deux fragments et le serveur de configuration.
 - `data/selection/` : lecteurs retenus, livres polars, lots E3 et F6. `data/measurements/` : mesures brutes.
 - `docs/` : documentation des services et exemples réels.

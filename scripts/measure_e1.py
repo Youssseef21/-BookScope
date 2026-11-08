@@ -73,7 +73,6 @@ def main() -> None:
 
     result = {
         "date": time.strftime("%Y-%m-%d"),
-        "prediction_file": "data/measurements/e2_prediction.txt",
         "hardware": {
             "platform": platform.platform(),
             "processor": platform.processor(),

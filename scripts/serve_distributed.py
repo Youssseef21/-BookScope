@@ -1,4 +1,4 @@
-"""Open the BookScope page on the two MongoDB instances.
+"""Open the BookScope page on the sharded cluster (mongos, port 27200).
 
     python scripts/serve_distributed.py
 """

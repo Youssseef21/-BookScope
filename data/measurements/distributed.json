@@ -1,100 +1,40 @@
 {
   "by_reader": {
     "placement": "by_reader",
-    "note": "Deux processus mongod sur cette machine, pas un cluster de machines.",
+    "note": "Cluster fragmenté : mongos sur 27200, shard1 sur 27101, shard2 sur 27102, configuration sur 27100. Plusieurs conteneurs sur un seul ordinateur, pas un groupe de machines. F1 à F5 ont les mêmes scores que la base principale.",
     "local_ratings": {
-      "A": {
-        "endpoint": "localhost:27018",
-        "ratings": 1117112,
-        "user_1": 0,
-        "user_2": 60,
-        "book_258": 648,
-        "book_1467": 139
-      },
-      "B": {
-        "endpoint": "localhost:27019",
-        "ratings": 1115972,
+      "shard1": {
+        "endpoint": "127.0.0.1:27101",
+        "ratings": 1096986,
         "user_1": 112,
+        "user_2": 60,
+        "book_258": 664,
+        "book_1467": 135
+      },
+      "shard2": {
+        "endpoint": "127.0.0.1:27102",
+        "ratings": 1136098,
+        "user_1": 0,
         "user_2": 0,
-        "book_258": 668,
-        "book_1467": 152
+        "book_258": 652,
+        "book_1467": 156
       }
     },
     "services": {
       "f2": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 2,
-            "documents": 118
-          },
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 2,
-            "documents": 66
-          }
-        }
+        "equal_to_single_server": true
       },
       "f1": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 5,
-            "documents": 10205
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 5,
-            "documents": 10333
-          }
-        }
+        "equal_to_single_server": true
       },
       "f4": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 6,
-            "documents": 17018
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 6,
-            "documents": 17084
-          }
-        }
+        "equal_to_single_server": true
       },
       "f3": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 5,
-            "documents": 11162
-          },
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 4,
-            "documents": 10802
-          }
-        }
+        "equal_to_single_server": true
       },
       "f5": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 3,
-            "documents": 388348
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 3,
-            "documents": 389511
-          }
-        }
+        "equal_to_single_server": true
       }
     },
     "f6": {
@@ -105,128 +45,63 @@
   },
   "by_book": {
     "placement": "by_book",
-    "note": "Deux processus mongod sur cette machine, pas un cluster de machines.",
+    "note": "Cluster fragmenté : mongos sur 27200, shard1 sur 27101, shard2 sur 27102, configuration sur 27100. Plusieurs conteneurs sur un seul ordinateur, pas un groupe de machines. F1 à F5 ont les mêmes scores que la base principale.",
     "local_ratings": {
-      "A": {
-        "endpoint": "localhost:27018",
-        "ratings": 1103379,
-        "user_1": 58,
-        "user_2": 34,
-        "book_258": 1316,
-        "book_1467": 0
-      },
-      "B": {
-        "endpoint": "localhost:27019",
-        "ratings": 1129705,
-        "user_1": 54,
-        "user_2": 26,
+      "shard1": {
+        "endpoint": "127.0.0.1:27101",
+        "ratings": 1172371,
+        "user_1": 59,
+        "user_2": 32,
         "book_258": 0,
         "book_1467": 291
+      },
+      "shard2": {
+        "endpoint": "127.0.0.1:27102",
+        "ratings": 1060713,
+        "user_1": 53,
+        "user_2": 28,
+        "book_258": 1316,
+        "book_1467": 0
       }
     },
     "services": {
       "f2": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 3,
-            "documents": 96
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 3,
-            "documents": 82
-          }
-        }
+        "equal_to_single_server": true
       },
       "f1": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 5,
-            "documents": 7622
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 2,
-            "documents": 5203
-          }
-        }
+        "equal_to_single_server": true
       },
       "f4": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 5,
-            "documents": 10743
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 5,
-            "documents": 9905
-          }
-        }
+        "equal_to_single_server": true
       },
       "f3": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 5,
-            "documents": 5796
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 5,
-            "documents": 6225
-          }
-        }
+        "equal_to_single_server": true
       },
       "f5": {
-        "equal_to_single_server": true,
-        "exchanged": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 3,
-            "documents": 387974
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 3,
-            "documents": 400452
-          }
-        }
+        "equal_to_single_server": true
       }
     }
   },
-  "by_book_instance_b_stopped": {
+  "by_book_one_shard_stopped": {
+    "ratings_reached": {
+      "shard1": {
+        "user_1": 59,
+        "user_2": 32
+      },
+      "shard2": {
+        "unavailable": true
+      }
+    },
     "F2": {
       "complete": false,
       "missing": [
-        "B (localhost:27019)"
+        "shard2 (localhost:27102)"
       ]
     },
     "F3": {
       "complete": false,
       "missing": [
-        "B (localhost:27019)"
-      ]
-    }
-  },
-  "by_book_one_instance_stopped": {
-    "F2": {
-      "complete": false,
-      "missing": [
-        "B (localhost:27019)"
-      ]
-    },
-    "F3": {
-      "complete": false,
-      "missing": [
-        "B (localhost:27019)"
+        "shard2 (localhost:27102)"
       ]
     },
     "catalogue_lookup_book_258": {
@@ -235,29 +110,7 @@
         "book_id": 258,
         "title": "The Shadow of the Wind (The Cemetery of Forgotten Books,  #1)"
       },
-      "why": "livres copiés sur les deux instances"
-    }
-  },
-  "by_reader_one_instance_stopped": {
-    "F2": {
-      "complete": false,
-      "missing": [
-        "B (localhost:27019)"
-      ]
-    },
-    "F3": {
-      "complete": false,
-      "missing": [
-        "B (localhost:27019)"
-      ]
-    },
-    "catalogue_lookup_book_258": {
-      "complete": true,
-      "answer": {
-        "book_id": 258,
-        "title": "The Shadow of the Wind (The Cemetery of Forgotten Books,  #1)"
-      },
-      "why": "livres copiés sur les deux instances"
+      "why": "les livres restent sur shard1"
     }
   }
 }

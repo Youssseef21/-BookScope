@@ -1,22 +1,28 @@
 {
-  "date": "2026-11-06",
+  "date": "2026-11-08",
   "prediction_file": "data/measurements/e2_prediction.txt",
+  "setup": "Serveur unique : bookscope_app sur le port 27017. Répartitions : dist_reader et dist_book à travers mongos, port 27200, fragments 27101 et 27102. Même ordinateur.",
   "environment": {
     "platform": "Windows-11-10.0.26300-SP0",
-    "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",
-    "cpu_count": 16,
+    "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",
+    "cpu_count": 8,
     "python": "3.12.10",
-    "mongo_server_version": "7.0.45",
-    "docker": {
-      "version": "29.8.0",
-      "cpus_available_to_containers": 16,
-      "memory_bytes": 8019406848,
-      "container_limits": "aucune limite explicite (docker run sans --cpus ni --memory)"
+    "single_server": {
+      "uri": "mongodb://localhost:27017",
+      "version": "8.3.11"
     },
-    "pymongo": "4.19.0"
+    "mongos": {
+      "uri": "mongodb://127.0.0.1:27200",
+      "version": "7.0.45"
+    },
+    "docker": {
+      "version": "29.6.2",
+      "cpus_available_to_containers": 8,
+      "memory_bytes": 6151180288
+    }
   },
   "protocol": {
-    "dataset": "toutes les notes de ratings.csv (5 976 479)",
+    "dataset": "notes de bookscope_app (2 233 084), les mêmes dans dist_reader et dist_book",
     "request_list_size": 4,
     "repeats": 3,
     "mixes": [
@@ -24,345 +30,348 @@
       "50/50",
       "0/100"
     ],
-    "warmup": "une passe complète non comptée avant les passes mesurées ; elle sert aussi à vérifier l'égalité des réponses",
-    "cache": "cache WiredTiger par défaut de mongo:7 ; pas de vidage entre les passes ; les trois configurations sont mesurées l'une après l'autre sur la même machine",
+    "warmup": "une passe complète non comptée avant les passes mesurées ; elle vérifie aussi l'égalité des réponses",
+    "cache": "pas de vidage entre les passes ; les configurations sont mesurées l'une après l'autre",
     "requests": {
       "personalised": [
-        "f3(34207)",
-        "f2(29511, 857)",
-        "f3(19220)",
-        "f2(49168, 28165)"
+        "f3(32571)",
+        "f2(34642, 12827)",
+        "f3(47822)",
+        "f2(30201, 546)"
       ],
       "exploration": [
-        "f1(746)",
-        "f4(931, 373)",
-        "f1(1255)",
-        "f4(622, 899)"
+        "f1(698)",
+        "f4(404, 400)",
+        "f1(64)",
+        "f4(660, 762)"
       ]
+    },
+    "where_notes_sit": {
+      "by_reader": {
+        "shard1": {
+          "users": {
+            "546": 0,
+            "12827": 168,
+            "30201": 0,
+            "32571": 117,
+            "34642": 0,
+            "47822": 0
+          },
+          "books": {
+            "64": 1396,
+            "400": 427,
+            "404": 447,
+            "660": 447,
+            "698": 254,
+            "762": 251
+          }
+        },
+        "shard2": {
+          "users": {
+            "546": 109,
+            "12827": 0,
+            "30201": 105,
+            "32571": 0,
+            "34642": 115,
+            "47822": 73
+          },
+          "books": {
+            "64": 1447,
+            "400": 449,
+            "404": 420,
+            "660": 466,
+            "698": 243,
+            "762": 247
+          }
+        }
+      },
+      "by_book": {
+        "shard1": {
+          "users": {
+            "546": 55,
+            "12827": 91,
+            "30201": 66,
+            "32571": 61,
+            "34642": 60,
+            "47822": 41
+          },
+          "books": {
+            "64": 0,
+            "400": 876,
+            "404": 0,
+            "660": 913,
+            "698": 0,
+            "762": 498
+          }
+        },
+        "shard2": {
+          "users": {
+            "546": 54,
+            "12827": 77,
+            "30201": 39,
+            "32571": 56,
+            "34642": 55,
+            "47822": 32
+          },
+          "books": {
+            "64": 2843,
+            "400": 0,
+            "404": 867,
+            "660": 0,
+            "698": 497,
+            "762": 0
+          }
+        }
+      }
     }
   },
   "configurations": {
     "single": {
       "100/0": {
         "requests": [
-          "f3(34207)",
-          "f2(29511, 857)",
-          "f3(19220)",
-          "f2(49168, 28165)"
+          "f3(32571)",
+          "f2(34642, 12827)",
+          "f3(47822)",
+          "f2(30201, 546)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 11872.1,
-          "mean": 11929.8,
-          "stdev": 336.6,
-          "min": 11625.7,
-          "max": 12291.5,
+          "median": 2082.5,
+          "mean": 2185.2,
+          "stdev": 196.9,
+          "min": 2060.9,
+          "max": 2412.2,
           "samples": [
-            11872.1,
-            12291.5,
-            11625.7
+            2412.2,
+            2060.9,
+            2082.5
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5848.7,
-          "f2(29511, 857)": 164.1,
-          "f3(19220)": 5904.4,
-          "f2(49168, 28165)": 36.6
-        },
-        "work_per_instance_one_pass": null
+          "f3(32571)": 1013.9,
+          "f2(34642, 12827)": 29.6,
+          "f3(47822)": 1022.9,
+          "f2(30201, 546)": 16.6
+        }
       },
       "50/50": {
         "requests": [
-          "f3(34207)",
-          "f1(746)",
-          "f2(29511, 857)",
-          "f4(931, 373)"
+          "f3(32571)",
+          "f1(698)",
+          "f2(34642, 12827)",
+          "f4(404, 400)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 27778.4,
-          "mean": 27693.6,
-          "stdev": 311.2,
-          "min": 27348.7,
-          "max": 27953.6,
+          "median": 8830.7,
+          "mean": 8768.0,
+          "stdev": 156.8,
+          "min": 8589.5,
+          "max": 8883.7,
           "samples": [
-            27778.4,
-            27348.7,
-            27953.6
+            8589.5,
+            8830.7,
+            8883.7
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5701.8,
-          "f1(746)": 14923.1,
-          "f2(29511, 857)": 157.6,
-          "f4(931, 373)": 6815.6
-        },
-        "work_per_instance_one_pass": null
+          "f3(32571)": 1028.2,
+          "f1(698)": 5226.4,
+          "f2(34642, 12827)": 36.3,
+          "f4(404, 400)": 2165.9
+        }
       },
       "0/100": {
         "requests": [
-          "f1(746)",
-          "f4(931, 373)",
-          "f1(1255)",
-          "f4(622, 899)"
+          "f1(698)",
+          "f4(404, 400)",
+          "f1(64)",
+          "f4(660, 762)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 43074.5,
-          "mean": 43455.2,
-          "stdev": 716.4,
-          "min": 43009.5,
-          "max": 44281.5,
+          "median": 23348.0,
+          "mean": 23836.1,
+          "stdev": 4647.8,
+          "min": 19451.6,
+          "max": 28708.8,
           "samples": [
-            43009.5,
-            44281.5,
-            43074.5
+            19451.6,
+            23348.0,
+            28708.8
           ]
         },
         "per_request_median_ms": {
-          "f1(746)": 15424.1,
-          "f4(931, 373)": 7294.0,
-          "f1(1255)": 13798.0,
-          "f4(622, 899)": 7038.3
-        },
-        "work_per_instance_one_pass": null
+          "f1(698)": 6301.6,
+          "f4(404, 400)": 2415.3,
+          "f1(64)": 10115.0,
+          "f4(660, 762)": 2049.1
+        }
       }
     },
     "by_reader": {
       "100/0": {
         "requests": [
-          "f3(34207)",
-          "f2(29511, 857)",
-          "f3(19220)",
-          "f2(49168, 28165)"
+          "f3(32571)",
+          "f2(34642, 12827)",
+          "f3(47822)",
+          "f2(30201, 546)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 11172.5,
-          "mean": 11211.2,
-          "stdev": 193.2,
-          "min": 11040.3,
-          "max": 11420.8,
+          "median": 5860.1,
+          "mean": 5650.8,
+          "stdev": 495.8,
+          "min": 5084.7,
+          "max": 6007.5,
           "samples": [
-            11172.5,
-            11040.3,
-            11420.8
+            5860.1,
+            5084.7,
+            6007.5
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5427.1,
-          "f2(29511, 857)": 165.1,
-          "f3(19220)": 5486.5,
-          "f2(49168, 28165)": 42.1
-        },
-        "work_per_instance_one_pass": {
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 14,
-            "documents": 23483
-          },
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 12,
-            "documents": 23160
-          }
+          "f3(32571)": 2361.6,
+          "f2(34642, 12827)": 145.6,
+          "f3(47822)": 3188.2,
+          "f2(30201, 546)": 73.3
         }
       },
       "50/50": {
         "requests": [
-          "f3(34207)",
-          "f1(746)",
-          "f2(29511, 857)",
-          "f4(931, 373)"
+          "f3(32571)",
+          "f1(698)",
+          "f2(34642, 12827)",
+          "f4(404, 400)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 28914.3,
-          "mean": 28860.1,
-          "stdev": 583.5,
-          "min": 28251.3,
-          "max": 29414.5,
+          "median": 12356.3,
+          "mean": 12593.2,
+          "stdev": 505.0,
+          "min": 12250.1,
+          "max": 13173.0,
           "samples": [
-            29414.5,
-            28914.3,
-            28251.3
+            12250.1,
+            13173.0,
+            12356.3
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5946.4,
-          "f1(746)": 15731.8,
-          "f2(29511, 857)": 168.2,
-          "f4(931, 373)": 6921.4
-        },
-        "work_per_instance_one_pass": {
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 19,
-            "documents": 38828
-          },
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 16,
-            "documents": 38055
-          }
+          "f3(32571)": 2501.8,
+          "f1(698)": 6029.9,
+          "f2(34642, 12827)": 140.7,
+          "f4(404, 400)": 4087.7
         }
       },
       "0/100": {
         "requests": [
-          "f1(746)",
-          "f4(931, 373)",
-          "f1(1255)",
-          "f4(622, 899)"
+          "f1(698)",
+          "f4(404, 400)",
+          "f1(64)",
+          "f4(660, 762)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 43983.9,
-          "mean": 44025.9,
-          "stdev": 526.6,
-          "min": 43521.6,
-          "max": 44572.3,
+          "median": 28222.4,
+          "mean": 28186.4,
+          "stdev": 288.8,
+          "min": 27881.3,
+          "max": 28455.5,
           "samples": [
-            44572.3,
-            43521.6,
-            43983.9
+            28455.5,
+            27881.3,
+            28222.4
           ]
         },
         "per_request_median_ms": {
-          "f1(746)": 16068.3,
-          "f4(931, 373)": 7220.9,
-          "f1(1255)": 13577.0,
-          "f4(622, 899)": 7083.2
-        },
-        "work_per_instance_one_pass": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 22,
-            "documents": 51637
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 22,
-            "documents": 51806
-          }
+          "f1(698)": 7758.4,
+          "f4(404, 400)": 7456.9,
+          "f1(64)": 9667.0,
+          "f4(660, 762)": 3331.0
         }
       }
     },
     "by_book": {
       "100/0": {
         "requests": [
-          "f3(34207)",
-          "f2(29511, 857)",
-          "f3(19220)",
-          "f2(49168, 28165)"
+          "f3(32571)",
+          "f2(34642, 12827)",
+          "f3(47822)",
+          "f2(30201, 546)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 11253.8,
-          "mean": 11379.0,
-          "stdev": 222.4,
-          "min": 11247.4,
-          "max": 11635.9,
+          "median": 9686.6,
+          "mean": 8645.2,
+          "stdev": 2563.9,
+          "min": 5724.4,
+          "max": 10524.6,
           "samples": [
-            11253.8,
-            11635.9,
-            11247.4
+            5724.4,
+            10524.6,
+            9686.6
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5576.1,
-          "f2(29511, 857)": 172.6,
-          "f3(19220)": 5542.8,
-          "f2(49168, 28165)": 43.3
-        },
-        "work_per_instance_one_pass": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 16,
-            "documents": 12980
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 16,
-            "documents": 13362
-          }
+          "f3(32571)": 4590.6,
+          "f2(34642, 12827)": 342.3,
+          "f3(47822)": 4080.4,
+          "f2(30201, 546)": 55.3
         }
       },
       "50/50": {
         "requests": [
-          "f3(34207)",
-          "f1(746)",
-          "f2(29511, 857)",
-          "f4(931, 373)"
+          "f3(32571)",
+          "f1(698)",
+          "f2(34642, 12827)",
+          "f4(404, 400)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 28033.4,
-          "mean": 28016.3,
-          "stdev": 276.1,
-          "min": 27732.1,
-          "max": 28283.5,
+          "median": 18384.6,
+          "mean": 16732.5,
+          "stdev": 4551.5,
+          "min": 11585.6,
+          "max": 20227.1,
           "samples": [
-            28283.5,
-            28033.4,
-            27732.1
+            20227.1,
+            11585.6,
+            18384.6
           ]
         },
         "per_request_median_ms": {
-          "f3(34207)": 5640.6,
-          "f1(746)": 14875.0,
-          "f2(29511, 857)": 175.6,
-          "f4(931, 373)": 7052.6
-        },
-        "work_per_instance_one_pass": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 17,
-            "documents": 24456
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 16,
-            "documents": 24473
-          }
+          "f3(32571)": 2492.1,
+          "f1(698)": 10077.6,
+          "f2(34642, 12827)": 134.9,
+          "f4(404, 400)": 3661.7
         }
       },
       "0/100": {
         "requests": [
-          "f1(746)",
-          "f4(931, 373)",
-          "f1(1255)",
-          "f4(622, 899)"
+          "f1(698)",
+          "f4(404, 400)",
+          "f1(64)",
+          "f4(660, 762)"
         ],
         "identical_to_single": true,
         "total_ms": {
-          "median": 42472.9,
-          "mean": 42466.1,
-          "stdev": 662.9,
-          "min": 41799.9,
-          "max": 43125.6,
+          "median": 28650.4,
+          "mean": 28516.1,
+          "stdev": 1205.6,
+          "min": 27249.0,
+          "max": 29648.9,
           "samples": [
-            43125.6,
-            41799.9,
-            42472.9
+            28650.4,
+            27249.0,
+            29648.9
           ]
         },
         "per_request_median_ms": {
-          "f1(746)": 14906.5,
-          "f4(931, 373)": 7146.7,
-          "f1(1255)": 12743.3,
-          "f4(622, 899)": 7220.6
-        },
-        "work_per_instance_one_pass": {
-          "A": {
-            "endpoint": "localhost:27018",
-            "calls": 17,
-            "documents": 33254
-          },
-          "B": {
-            "endpoint": "localhost:27019",
-            "calls": 17,
-            "documents": 34998
-          }
+          "f1(698)": 5610.4,
+          "f4(404, 400)": 6385.5,
+          "f1(64)": 12147.6,
+          "f4(660, 762)": 3592.0
         }
       }
     }

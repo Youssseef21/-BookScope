@@ -1,6 +1,5 @@
 {
   "date": "2026-10-30",
-  "prediction_file": "data/measurements/e2_prediction.txt",
   "hardware": {
     "platform": "Windows-11-10.0.26300-SP0",
     "processor": "Intel64 Family 6 Model 142 Stepping 12, GenuineIntel",

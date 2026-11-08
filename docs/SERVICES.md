@@ -1,6 +1,6 @@
 # Les six services
 
-Chaque service s'utilise en ligne de commande (`scripts/`), par la page web (`scripts/serve.py`) ou comme fonction Python (`bookscope/`). Les résultats sont calculés à chaque appel depuis MongoDB. Les exemples sont des sorties réelles, enregistrées dans `docs/examples/`, sur la base `bookscope_app` (2 233 084 notes, lot F6 importé).
+Chaque service s'utilise en ligne de commande (`scripts/`), par la page de la base principale (`scripts/serve.py`, http://127.0.0.1:8000) ou par la page du cluster (`scripts/serve_distributed.py`, http://127.0.0.1:8001). Cette page parle à mongos (port 27200). Les mêmes fonctions Python (`bookscope/`) calculent le résultat à chaque appel. Par lecteur ou par livre, F1 à F5 donnent les mêmes scores que sur `bookscope_app`. Si un fragment est arrêté, la page affiche « Réponse refusée : elle serait incomplète. » Le titre d'un livre peut encore s'afficher, parce que le catalogue est sur shard1. Les exemples sont des sorties réelles, enregistrées dans `docs/examples/`, sur la base `bookscope_app` (2 233 084 notes, lot F6 importé).
 
 Chaque résultat cite ses preuves : `user_id`, note et `source_row`. Pour retrouver une note dans le fichier d'origine, regarder la ligne `source_row + 1` de `data/raw/ratings.csv` (l'en-tête compte pour une ligne).
 

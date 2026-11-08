@@ -1,16 +1,17 @@
-"""E2 : serveur unique contre deux répartitions, sur deux charges.
+"""E2 : serveur unique contre les deux répartitions du cluster fragmenté.
 
-Données : toutes les notes (préparées par prepare_e2_data.py).
-Trois configurations : serveur unique, répartition par lecteur, par livre.
+Données : les 2 233 084 notes de bookscope_app, déjà copiées dans
+dist_reader et dist_book. Trois configurations : serveur unique (port 27017),
+répartition par lecteur, répartition par livre. Les deux répartitions passent
+par mongos (port 27200).
+
 Deux charges : personnalisée (F2 et F3) et exploration (F1 et F4).
-
 On fait varier la part de chaque charge (100/0, 50/50, 0/100) dans une liste
 de SIZE requêtes, identique pour les trois configurations. Une passe
-d'échauffement non comptée vérifie aussi que les réponses sont identiques ;
-puis REPEATS passes sont mesurées (médiane, moyenne, écart-type) avec le
-travail fait sur chaque instance.
+d'échauffement non comptée vérifie que les réponses sont identiques ;
+puis REPEATS passes sont mesurées (médiane, moyenne, écart-type).
 
-    python scripts/measure_e2.py [--size 8] [--repeats 5]
+    python scripts/measure_e2.py --size 4 --repeats 3
 """
 
 from __future__ import annotations
@@ -30,35 +31,34 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from pymongo import MongoClient
 
-from bookscope.cluster import Cluster
-from bookscope.db import MONGO_URI
+from bookscope.db import MONGO_URI, connect
 from bookscope.f1 import explore
 from bookscope.f2 import compare
 from bookscope.f3 import recommend
 from bookscope.f4 import trace
+from bookscope.sharded import DATABASES, MONGOS_URI, SHARDS, open_placement
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "data" / "measurements" / "e2.json"
-SEED = 20261106
+PREDICTION = "data/measurements/e2_prediction.txt"
+SEED = 20261108
 MIXES = ((1.0, "100/0"), (0.5, "50/50"), (0.0, "0/100"))
 
 
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--size", type=int, default=8)
-    parser.add_argument("--repeats", type=int, default=5)
+    parser.add_argument("--size", type=int, default=4)
+    parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--only", choices=("single", "by_reader", "by_book"))
     args = parser.parse_args()
 
-    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-    client.admin.command("ping")
-    single = client["e1_all"]
-    configs = {"single": single}
-    for placement in ("by_reader", "by_book"):
-        cluster = Cluster(placement, "_full")
-        cluster.refresh()
-        configs[placement] = cluster
+    single = connect()
+    configs = {
+        "single": single,
+        "by_reader": open_placement("by_reader"),
+        "by_book": open_placement("by_book"),
+    }
     if args.only:
         configs = {args.only: configs[args.only]}
 
@@ -74,29 +74,38 @@ def main() -> None:
     answers_single: dict[str, object] = {}
     report = {
         "date": time.strftime("%Y-%m-%d"),
-        "prediction_file": "data/measurements/e2_prediction.txt",
-        "environment": environment(client),
+        "prediction_file": PREDICTION,
+        "setup": (
+            "Serveur unique : bookscope_app sur le port 27017. "
+            "Répartitions : dist_reader et dist_book à travers mongos, port 27200, "
+            "fragments 27101 et 27102. Même ordinateur."
+        ),
+        "environment": environment(),
         "protocol": {
-            "dataset": "toutes les notes de ratings.csv (5 976 479)",
+            "dataset": "notes de bookscope_app (2 233 084), les mêmes dans dist_reader et dist_book",
             "request_list_size": args.size,
             "repeats": args.repeats,
             "mixes": [label for _share, label in MIXES],
-            "warmup": "une passe complète non comptée avant les passes mesurées ; elle sert aussi à vérifier l'égalité des réponses",
-            "cache": "cache WiredTiger par défaut de mongo:7 ; pas de vidage entre les passes ; les trois configurations sont mesurées l'une après l'autre sur la même machine",
+            "warmup": "une passe complète non comptée avant les passes mesurées ; elle vérifie aussi l'égalité des réponses",
+            "cache": "pas de vidage entre les passes ; les configurations sont mesurées l'une après l'autre",
             "requests": {
                 "personalised": [describe(r) for r in personalised],
                 "exploration": [describe(r) for r in exploration],
             },
+            "where_notes_sit": where_notes_sit(personalised, exploration),
         },
         "configurations": {},
     }
 
-    for name, target in configs.items():
+    order = [name for name in ("single", "by_reader", "by_book") if name in configs]
+    for name in order:
         print(f"== {name}", flush=True)
         entry = {}
         for label, requests in mixes.items():
-            entry[label] = measure_mix(name, target, requests, args.repeats, answers_single)
+            print(f"  mélange {label}", flush=True)
+            entry[label] = measure_mix(name, configs[name], requests, args.repeats, answers_single)
         report["configurations"][name] = entry
+        OUTPUT.parent.mkdir(parents=True, exist_ok=True)
         OUTPUT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
@@ -114,6 +123,8 @@ def build_requests(db, size: int) -> tuple[list[tuple], list[tuple]]:
             allowDiskUse=True,
         )
     ]
+    if len(readers) < size + 1:
+        raise RuntimeError(f"pas assez de lecteurs entre 60 et 150 notes : {len(readers)}")
     rng.shuffle(readers)
     personalised: list[tuple] = []
     for index in range(size):
@@ -126,9 +137,14 @@ def build_requests(db, size: int) -> tuple[list[tuple], list[tuple]]:
 
     popularity = {
         row["_id"]: row["n"]
-        for row in db.ratings.aggregate([{"$group": {"_id": "$book_id", "n": {"$sum": 1}}}], allowDiskUse=True)
+        for row in db.ratings.aggregate(
+            [{"$group": {"_id": "$book_id", "n": {"$sum": 1}}}],
+            allowDiskUse=True,
+        )
     }
-    middle = sorted(book for book, n in popularity.items() if 800 <= n <= 3000)
+    middle = sorted(book for book, count in popularity.items() if 400 <= count <= 3000)
+    if len(middle) < size * 2:
+        raise RuntimeError(f"pas assez de livres entre 400 et 3000 notes : {len(middle)}")
     rng.shuffle(middle)
     exploration: list[tuple] = []
     for index in range(size):
@@ -142,14 +158,33 @@ def build_requests(db, size: int) -> tuple[list[tuple], list[tuple]]:
 def overlapping_reader(db, user_id: int, rng: random.Random) -> int:
     books = [row["book_id"] for row in db.ratings.find({"user_id": user_id}, {"_id": 0, "book_id": 1})]
     rng.shuffle(books)
-    for book in books[:10]:
+    for book in books[:12]:
         others = [
             row["user_id"]
-            for row in db.ratings.find({"book_id": book, "user_id": {"$ne": user_id}}, {"_id": 0, "user_id": 1}).limit(200)
+            for row in db.ratings.find(
+                {"book_id": book, "user_id": {"$ne": user_id}},
+                {"_id": 0, "user_id": 1},
+            ).limit(200)
         ]
         if others:
             return sorted(others)[rng.randrange(len(others))]
-    raise RuntimeError("aucun lecteur en commun")
+    raise RuntimeError(f"aucun lecteur en commun avec {user_id}")
+
+
+def where_notes_sit(personalised: list[tuple], exploration: list[tuple]) -> dict:
+    users = sorted({item for request in personalised for item in request[1:]})
+    books = sorted({item for request in exploration for item in request[1:]})
+    placed = {}
+    for placement, database in DATABASES.items():
+        placed[placement] = {}
+        for name, uri in SHARDS:
+            client = MongoClient(uri, directConnection=True, serverSelectionTimeoutMS=8000)
+            ratings = client[database].ratings
+            placed[placement][name] = {
+                "users": {str(user_id): ratings.count_documents({"user_id": user_id}) for user_id in users},
+                "books": {str(book_id): ratings.count_documents({"book_id": book_id}) for book_id in books},
+            }
+    return placed
 
 
 def interleave(first: list[tuple], second: list[tuple]) -> list[tuple]:
@@ -178,37 +213,28 @@ def execute(target, request: tuple):
 
 
 def measure_mix(name: str, target, requests: list[tuple], repeats: int, answers_single: dict) -> dict:
-    label = ",".join(describe(r) for r in requests)
-    is_cluster = isinstance(target, Cluster)
-    # passe d'échauffement, qui sert aussi à comparer avec le serveur unique
-    answers = []
-    for request in requests:
-        if is_cluster:
-            target.clear()
-        answers.append(canonical(execute(target, request)))
+    label = ",".join(describe(request) for request in requests)
+    answers = [canonical(execute(target, request)) for request in requests]
     if name == "single":
         answers_single[label] = answers
         identical = True
     else:
         identical = answers == answers_single.get(label)
+        if not identical:
+            print(f"    réponses différentes de celles du serveur unique ({label})", flush=True)
 
     totals = []
     per_request: dict[str, list[float]] = {}
-    work = None
     for _ in range(repeats):
-        if is_cluster:
-            target.clear()
         started = time.perf_counter()
         for request in requests:
             began = time.perf_counter()
             execute(target, request)
             per_request.setdefault(describe(request), []).append((time.perf_counter() - began) * 1000)
         totals.append((time.perf_counter() - started) * 1000)
-        if is_cluster and work is None:
-            work = target.summary()
-    print(f"  {name} {len(requests)} requêtes : médiane {statistics.median(totals):.0f} ms", flush=True)
+    print(f"    médiane {statistics.median(totals) / 1000:.1f} s", flush=True)
     return {
-        "requests": [describe(r) for r in requests],
+        "requests": [describe(request) for request in requests],
         "identical_to_single": identical,
         "total_ms": {
             "median": round(statistics.median(totals), 1),
@@ -218,8 +244,9 @@ def measure_mix(name: str, target, requests: list[tuple], repeats: int, answers_
             "max": round(max(totals), 1),
             "samples": [round(value, 1) for value in totals],
         },
-        "per_request_median_ms": {key: round(statistics.median(values), 1) for key, values in per_request.items()},
-        "work_per_instance_one_pass": work,
+        "per_request_median_ms": {
+            key: round(statistics.median(values), 1) for key, values in per_request.items()
+        },
     }
 
 
@@ -227,13 +254,16 @@ def canonical(value):
     return json.loads(json.dumps(value, sort_keys=True, default=str))
 
 
-def environment(client) -> dict:
+def environment() -> dict:
+    single = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    router = MongoClient(MONGOS_URI, serverSelectionTimeoutMS=5000)
     info = {
         "platform": platform.platform(),
         "processor": platform.processor(),
         "cpu_count": os.cpu_count(),
         "python": platform.python_version(),
-        "mongo_server_version": client.server_info()["version"],
+        "single_server": {"uri": MONGO_URI, "version": single.server_info()["version"]},
+        "mongos": {"uri": MONGOS_URI, "version": router.server_info()["version"]},
     }
     try:
         text = subprocess.run(
@@ -241,17 +271,16 @@ def environment(client) -> dict:
             capture_output=True,
             text=True,
             timeout=30,
+            check=True,
         ).stdout.strip()
         version, cpus, memory = text.split("|")
-        info["docker"] = {"version": version, "cpus_available_to_containers": int(cpus), "memory_bytes": int(memory), "container_limits": "aucune limite explicite (docker run sans --cpus ni --memory)"}
-    except Exception:
-        info["docker"] = "indisponible"
-    try:
-        import pymongo
-
-        info["pymongo"] = pymongo.version
-    except Exception:
-        pass
+        info["docker"] = {
+            "version": version,
+            "cpus_available_to_containers": int(cpus),
+            "memory_bytes": int(memory),
+        }
+    except Exception as error:
+        info["docker"] = f"indisponible : {error}"
     return info
 
 

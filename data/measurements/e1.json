@@ -1,6 +1,5 @@
 {
   "date": "2026-11-06",
-  "prediction_file": "data/measurements/e2_prediction.txt",
   "hardware": {
     "platform": "Windows-11-10.0.26300-SP0",
     "processor": "AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD",

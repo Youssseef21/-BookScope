@@ -1,0 +1,85 @@
+# Cluster fragmenté. L'application ne parle qu'à mongos.
+# cfg 27100, shard1 27101, shard2 27102, mongos 27200.
+
+name: bookscope-sharded
+
+services:
+  cfg:
+    image: mongo:7
+    container_name: bookscope-cfg
+    hostname: cfg
+    command:
+      - mongod
+      - --configsvr
+      - --replSet
+      - cfgRS
+      - --bind_ip_all
+      - --port
+      - "27017"
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+    ports:
+      - "27100:27017"
+    volumes:
+      - bookscope-cfg:/data/db
+
+  shard1:
+    image: mongo:7
+    container_name: bookscope-shard1
+    hostname: shard1
+    command:
+      - mongod
+      - --shardsvr
+      - --replSet
+      - shard1
+      - --bind_ip_all
+      - --port
+      - "27017"
+      - --wiredTigerCacheSizeGB
+      - "0.5"
+    ports:
+      - "27101:27017"
+    volumes:
+      - bookscope-shard1:/data/db
+
+  shard2:
+    image: mongo:7
+    container_name: bookscope-shard2
+    hostname: shard2
+    command:
+      - mongod
+      - --shardsvr
+      - --replSet
+      - shard2
+      - --bind_ip_all
+      - --port
+      - "27017"
+      - --wiredTigerCacheSizeGB
+      - "0.5"
+    ports:
+      - "27102:27017"
+    volumes:
+      - bookscope-shard2:/data/db
+
+  mongos:
+    image: mongo:7
+    container_name: bookscope-mongos
+    depends_on:
+      - cfg
+      - shard1
+      - shard2
+    command:
+      - mongos
+      - --configdb
+      - cfgRS/cfg:27017
+      - --bind_ip_all
+      - --port
+      - "27017"
+    ports:
+      - "27200:27017"
+    restart: unless-stopped
+
+volumes:
+  bookscope-cfg:
+  bookscope-shard1:
+  bookscope-shard2:

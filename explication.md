@@ -47,22 +47,21 @@ Ces trois lots ne se recouvrent pas. Une note est identifiée par le couple lect
 
 3. **Deux façons de ranger les mêmes notes.** Une note par document, ou toutes les notes d'un lecteur dans un seul document. Partir d'un livre est beaucoup plus lent dans le second rangement (56 ms contre 5,5 ms pour les notes d'au moins 4/5 du livre 258). Les services gardent donc une note par document.
 
-4. **Deux serveurs sur cet ordinateur**, ports 27018 (A) et 27019 (B), chacun avec son disque. Ce n'est pas un groupe de machines. Les livres sont copiés des deux côtés. Chaque note n'est que d'un côté.
-   - Par lecteur : le lecteur 1 a ses 112 notes sur B, le lecteur 2 a les siennes sur A.
-   - Par livre : le livre 258 est entier sur A, le livre 1467 est entier sur B, et le lecteur 1 est coupé entre les deux.
-   - F1, F2, F3 et F4 donnent le même résultat que sur le serveur unique. Si B est arrêté alors que les notes du lecteur 1 sont des deux côtés, F2 et F3 ne répondent pas : une réponse incomplète n'est pas présentée comme complète.
+4. **Cluster fragmenté.** `bookscope_app` reste sur le port 27017 : c'est la page http://127.0.0.1:8000. La partie distribuée est dans `compose.sharded.yml`. L'application parle seulement à mongos, port 27200. mongos interroge le serveur de configuration (port 27100) et envoie le travail à shard1 (27101) ou shard2 (27102). Chaque fragment a son disque. `dist_reader` garde toutes les notes d'un lecteur sur un fragment. `dist_book` garde toutes les notes d'un livre sur un fragment. Les livres restent sur shard1. La page http://127.0.0.1:8001 choisit l'une ou l'autre base. Ce sont plusieurs processus sur un seul ordinateur, pas un groupe de machines.
+   - Sur 2 233 084 notes : par lecteur, 1 096 986 sur shard1 et 1 136 098 sur shard2 ; par livre, 1 172 371 et 1 060 713. Les lecteurs 1 et 2 sont entiers sur shard1 dans la première base. Dans la seconde, le livre 258 est entier sur shard2, le livre 1467 entier sur shard1, et le lecteur 1 est coupé (59 et 53).
+   - Si shard2 est arrêté alors que le placement est par livre, une partie des notes des lecteurs 1 et 2 est sur ce fragment. F2 et F3 refusent de répondre. La page dit « Réponse refusée : elle serait incomplète. » Le titre du livre 258 répond encore, parce que le catalogue est sur shard1. Les notes de ce livre, elles, sont sur shard2 : l'exploration complète est refusée.
 
 5. **E1, trois tailles de notes**, préfixes du fichier complet. Mêmes questions à chaque fois : lecteurs 2276 et 4606, livre 26 (*The Da Vinci Code*).
 
    | Notes | Lecteurs | Chargement | Disque | F2 | F1 |
    |---:|---:|---:|---:|---:|---:|
-   | 200 000 | 3 374 | 9,1 s | 17 Mo | 10 ms | 3,3 s |
-   | 1 000 000 | 12 586 | 31 s | 41 Mo | 17 ms | 6,5 s |
-   | 5 976 479 | 53 424 | 174 s | 167 Mo | 59 ms | 27 s |
+   | 200 000 | 3 374 | 5,4 s | 13 Mo | 18 ms | 2,8 s |
+   | 1 000 000 | 12 586 | 16,2 s | 40 Mo | 41 ms | 5,9 s |
+   | 5 976 479 | 53 424 | 86,3 s | 162 Mo | 134 ms | 27,7 s |
 
-6. **E2 a été mesurée** le 6 novembre 2026, après la prédiction déposée le 30 octobre dans `data/measurements/e2_prediction.txt`. Le jeu est le fichier complet, 5 976 479 notes. Trois configurations : le serveur unique, la répartition par lecteur, la répartition par livre. Deux charges : personnalisée (F2 et F3) et exploration (F1 et F4). Quatre requêtes, un échauffement non compté, puis 3 répétitions.
+6. **E2 a été mesurée** après la prédiction déposée dans `data/measurements/e2_prediction.txt`, sur la même machine que les autres tests. Le jeu est celui de l'application, 2 233 084 notes. Trois configurations : le serveur unique, mongos par lecteur, mongos par livre. Quatre requêtes, un échauffement non compté, puis 3 répétitions. Les réponses sont identiques.
 
-   La prédiction disait que le serveur unique serait le plus rapide, la répartition par lecteur meilleure pour un lecteur, et la répartition par livre meilleure pour un livre. Les temps mesurés sont du même ordre dans les trois configurations : environ 12 s pour quatre requêtes personnalisées, environ 28 s pour un mélange, environ 43 s pour quatre requêtes d'exploration. L'écart entre configurations reste dans l'écart-type. La prédiction n'est pas confirmée. Les deux instances tournent sur la même machine et se partagent le processeur, la mémoire et le disque. Le détail est dans `data/measurements/e2.json`.
+   Médianes : questions lecteur 2,1 s, 5,9 s et 9,7 s ; mélange 8,8 s, 12,4 s et 18,4 s ; questions livre 23,3 s, 28,2 s et 28,7 s. L'ordre est serveur unique, puis par lecteur, puis par livre. Par lecteur gagne sur les questions lecteur, comme prévu. Sur les questions livre, par lecteur et par livre se rejoignent : une exploration lit aussi d'autres livres, donc les deux fragments travaillent. Le détail est dans `data/measurements/e2.json`.
 
 7. **E3** juge F3 sur les notes jamais chargées dans l'application, `e3_eval.csv`. Une proposition est bonne si le livre était noté au moins 4/5 dans les 5 dernières notes du lecteur. Sur 1 500 lecteurs, avec l'historique complet, F3 retrouve un tel livre dans ses 10 propositions pour 9,8 % des lecteurs. Proposer les livres les plus notés y arrive pour 4,9 %. Avec seulement les 5 premières notes, F3 tombe à 3,1 %, au niveau de cette baseline. Le fichier `data/measurements/e3.json` note aussi les fuites possibles : les compteurs de tags viennent du jeu Goodreads complet, et l'ordre du fichier date chaque lecteur, pas les voisins entre eux.
 
@@ -70,4 +69,4 @@ Ces trois lots ne se recouvrent pas. Une note est identifiée par le couple lect
 
 ## Ce qui reste
 
-Le code, les mesures et le README sont dans le dépôt. Le rapport demandé par le sujet, dix pages au plus, n'y est pas. La page http://127.0.0.1:8000 interroge le serveur unique. Les deux instances se lancent et se comparent avec les scripts, pas avec cette page. Les 102 930 notes de `e3_eval.csv` restent en dehors de l'application : c'est le lot qui sert à juger F3, il ne doit pas être chargé.
+Le code, les mesures et le README sont dans le dépôt. Le rapport demandé par le sujet, dix pages au plus, n'y est pas. La page http://127.0.0.1:8000 interroge la base principale. La page http://127.0.0.1:8001 interroge mongos, par lecteur ou par livre. Les 102 930 notes de `e3_eval.csv` restent en dehors de l'application : c'est le lot qui sert à juger F3, il ne doit pas être chargé.

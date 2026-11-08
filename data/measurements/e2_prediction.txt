@@ -1,22 +1,16 @@
-Prédiction E2, écrite avant toute mesure de cette expérience.
-Date : 30 octobre 2026.
+Prédiction E2, écrite avant la mesure sur le cluster fragmenté.
 Auteur : Youssef Harrane, M2 SLCD.
 
-Les temps de E2 ne sont pas encore mesurés. Cette prédiction s'appuie seulement sur l'emplacement des notes.
+Le jeu mesuré est celui de l'application : 2 233 084 notes, déjà placées dans dist_reader et dist_book. Trois configurations : le serveur unique (bookscope_app, port 27017), la répartition par lecteur et la répartition par livre, les deux à travers mongos (port 27200).
 
-Le plus grand jeu de E1 sera toutes les notes de ratings.csv. Les trois configurations comparées seront :
-- le serveur MongoDB unique ;
-- deux instances, notes réparties par lecteur (user_id pair sur A, impair sur B) ;
-- deux instances, notes réparties par livre (book_id pair sur A, impair sur B).
+Charge personnalisée : F2 et F3, des questions qui partent d'un lecteur.
+Charge d'exploration : F1 et F4, des questions qui partent d'un livre.
+Les mêmes requêtes seront soumises aux trois configurations.
 
-Charge personnalisée : F2, comparer deux lecteurs, et F3, proposer des livres à un lecteur.
-Charge d'exploration : F1, explorer un livre, et F4, relier deux livres.
-Les mêmes lecteurs et les mêmes livres seront soumis aux trois configurations.
+Prédiction.
+Le serveur unique et le cluster devraient rester dans le même ordre de grandeur : mongos, les deux fragments et le serveur de configuration se partagent le même ordinateur.
 
-Prédiction pour la charge personnalisée.
-Le serveur unique devrait être le plus rapide. Les deux instances tournent sur le même ordinateur et se partagent le processeur, la mémoire et le disque. L'application doit en plus fusionner les réponses.
-Entre les deux répartitions, celle par lecteur devrait être plus rapide que celle par livre. Toutes les notes d'un lecteur sont alors sur une seule instance. Avec la répartition par livre, l'historique du lecteur 1 est coupé : 58 notes sur A et 54 sur B.
+Entre les deux répartitions, celle par lecteur devrait être la plus rapide sur la charge personnalisée. Toutes les notes d'un lecteur sont alors sur un seul fragment.
+Celle par livre devrait être la plus rapide sur la charge d'exploration. Toutes les notes d'un livre sont alors sur un seul fragment.
 
-Prédiction pour la charge d'exploration.
-Le serveur unique devrait encore être le plus rapide, pour la même raison matérielle.
-Entre les deux répartitions, celle par livre devrait être plus rapide que celle par lecteur. Toutes les notes d'un livre sont alors sur une seule instance. Le livre 258 est entier sur A dans ce découpage, alors qu'il est coupé en 648 et 668 notes dans le découpage par lecteur.
+mongos peut interroger les deux fragments pour une même requête. Cette prédiction ne suppose pas que le serveur unique gagne.

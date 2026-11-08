@@ -8,7 +8,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from bookscope.cluster import PLACEMENTS, Cluster
+from bookscope.sharded import PLACEMENTS, Incomplete, open_placement
 from bookscope.db import connect
 from bookscope.f1 import explore
 from bookscope.f2 import compare
@@ -33,7 +33,7 @@ def main(port: int | None = None, distributed: bool = False) -> None:
     elif distributed:
         PORT = 8001
     server = ThreadingHTTPServer((HOST, PORT), Handler)
-    label = "deux instances" if distributed else "serveur unique"
+    label = "cluster fragmenté" if distributed else "serveur unique"
     print(f"BookScope ({label}) : http://{HOST}:{PORT}", flush=True)
     server.serve_forever()
 
@@ -62,6 +62,13 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, page("Introuvable", "<p>Cette page n'existe pas.</p>"))
                 return
+        except Incomplete as error:
+            body = (
+                "<p class='warn'>Réponse refusée : elle serait incomplète. "
+                f"{esc(error)}</p>"
+            )
+            if parsed.path == "/explore":
+                body = catalogue_card(params) + body
         except Exception as error:
             body = f"<p class='warn'>La base n'a pas répondu. {esc(error)}</p>"
         self._send(200, page("BookScope", body))
@@ -86,6 +93,11 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._send(404, page("Introuvable", "<p>Cette page n'existe pas.</p>"))
                 return
+        except Incomplete as error:
+            body = (
+                "<p class='warn'>Réponse refusée : elle serait incomplète. "
+                f"{esc(error)}</p>"
+            )
         except Exception as error:
             body = f"<p class='warn'>La base n'a pas répondu. {esc(error)}</p>"
         self._send(200, page("BookScope", body))
@@ -107,11 +119,8 @@ def current_placement() -> str:
 def database():
     if not DISTRIBUTED:
         return connect()
-    # Les mêmes fonctions F1 à F6 lisent les deux instances.
-    # Les livres sont copiés des deux côtés ; chaque note n'est que d'un côté.
-    cluster = Cluster(current_placement())
-    cluster.refresh()
-    return cluster
+    # Une seule adresse, mongos. Il envoie la requête au fragment qui a les notes.
+    return open_placement(current_placement())
 
 
 def explore_href(book_id: int) -> str:
@@ -123,6 +132,25 @@ def explore_href(book_id: int) -> str:
 def one(params: dict[str, list[str]], name: str) -> str:
     values = params.get(name) or [""]
     return values[0].strip()
+
+
+def catalogue_card(params: dict[str, list[str]]) -> str:
+    """Titre lu dans le catalogue, sans toucher aux notes."""
+    query = one(params, "q")
+    if not query.isdigit():
+        return ""
+    book = database().books.find_one(
+        {"book_id": int(query)},
+        {"_id": 0, "book_id": 1, "title": 1, "authors": 1},
+    )
+    if not book:
+        return ""
+    return (
+        f"<h2>{book['book_id']} — {esc(book['title'])}</h2>"
+        f"<p>{esc(book.get('authors'))}</p>"
+        "<p>Cette fiche vient du catalogue, qui reste sur shard1. "
+        "Les notes ne sont pas réunies.</p>"
+    )
 
 
 def render_explore(params: dict[str, list[str]]) -> str:
@@ -572,9 +600,10 @@ def page(title: str, result: str) -> str:
     if DISTRIBUTED:
         mode = "par lecteur" if placement == "by_reader" else "par livre"
         intro = (
-            "<p class=\"lead\">Cette page interroge les deux instances ensemble : "
-            "A sur localhost:27018 et B sur localhost:27019. Les livres sont copiés "
-            "des deux côtés. Chaque note n'est stockée que d'un côté. "
+            "<p class=\"lead\">Cette page parle seulement à mongos, "
+            "localhost:27200. mongos envoie chaque requête à shard1 (27101) "
+            "ou shard2 (27102), puis réunit les réponses. Environ la moitié "
+            "des notes est sur chaque fragment. Les livres restent sur shard1. "
             f"Répartition en cours : {mode}. "
             "<a href=\"http://127.0.0.1:8000\">Serveur unique</a>.</p>"
             "<p><a href=\"/?placement=by_reader\">Par lecteur</a> · "
@@ -584,7 +613,7 @@ def page(title: str, result: str) -> str:
         intro = (
             "<p class=\"lead\">Exploration du catalogue à partir des notes des lecteurs retenus. "
             "Les notes cachées pour l'évaluation ne sont pas utilisées. "
-            "L'interface branchée sur les deux instances est sur "
+            "L'interface branchée sur le cluster fragmenté est sur "
             "<a href=\"http://127.0.0.1:8001\">http://127.0.0.1:8001</a>.</p>"
         )
     return f"""<!DOCTYPE html>
